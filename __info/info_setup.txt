@@ -1,0 +1,40 @@
+#### FRONTEND SETUP
+
+react app을 설치합니다.
+$ npx create-react-app airbnb-clone-frontend --template=typescript
+설치가 완료 후 해당 app이 설치가 됩니다.
+
+하단 파일들을 삭제합니다.
+src>App.css
+   >App.test.tsx
+   >index.css
+   >logo.svg
+   >reportWebVitals.js
+   >setupTest.js
+src>index.tsx 에 삭제한 파일의 import부분을 삭제한다.
+
+charkra ui와 reat-router-dom을 설치해 준다.
+$ npm i @chakra-ui/react @emotion/react @emotion/styled framer-motion
+$ npm i react-router-dom
+
+index.tsx에 charkra부분을 추가해준다. 자동으로 chrkra가 import됩니다.
+    <ChakraProvider>
+      <App /> // 기존 소스.해당 코드를 감싸줍니다.
+    </ChakraProvider>
+charkra를 감싸주는 이유는 테마와 구성을 모든 컴포넌트에 전달하는 방식은 좋지 않다.
+가장 좋은 방식이 Provider를 생성하는 방법이다.
+
+실행되는지 확인
+$ npm run start
+추가로 내용을 추가해서 나오는지 확인. App.tsx에 Text태그를 사용하는데, charkra/react가 import되는 태그를 골라서 사용한다.
+해당 태그를 tap하여 고르게되면 자동으로 charkra가 import가 된다.
+      <Text color={"red.500"} fontSize={"6xl"}>
+        It's works ye!!!!
+      </Text>
+
+--react_basic.txt에서 기초 내용을 기재
+
+연결 테스트가 완료되면 App.tsx도 삭제 해준다.
+삭제된 app대신에 router를 import해준다.
+router를 사용하기 위해서 router코드에 export를 구현해준다.
+    export default router;

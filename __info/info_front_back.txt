@@ -1,0 +1,6 @@
+##### 19. React Query
+
+기본적으로 서버는 user가 fetch를 하지 못하도록 막고 있다. 일부 페이지는 허용하여 데이터 변경이 가능하도록 설정해야된다.
+해당 기능을 위해서는 djnago-cors-headers를 설치해줘야한다.
+$ poetry add django-cors-headers
+config>settings INSTALLED_APPS에 "corsheaders"를 추가해준다. 

@@ -1,0 +1,55 @@
+#### FRONT-END SETUP
+
+수직 스택을 구현할 때 사용하는 태그. flex를 사용하여 aliens-content=center(맞나?)를 사용한 효과를 기본으로 설정되어있다.
+    <Vstack>
+
+차크라 header구현 태그
+    <Heading>
+
+차크라에 사용되는 속성은 단축된 언어로도 사용이 가능하다.
+    bg = background, m = margin, p = padding
+
+NotFound 기본페이지 구현. 차크라는 css설정없이도 페이지를 아름답게 만들어준다. It's beauty
+    export default function NotFound() {
+        return (
+            <VStack bg="gray.100" justifyContent={"center"} minH="100vh">
+                <Heading>Page not found.</Heading>
+                <Text>It's seems that you're lost.</Text>
+                <Link to="/">
+                    <Button colorScheme={"red"} variant={"link"}>
+                        Go home &rarr;
+                    </Button>
+                </Link>
+            </VStack>
+        );
+    }
+
+box는 charkra의 기본적인 요소이다.
+box에 속성을 부여하면 child요소에 적용이 된다.
+
+react-icon에는 컬러를 적용할때 색깔 코드(#006752)로만 적용이 된다. Box에 아이콘을 넣어서 Box에다 속성을 부여하자
+    <Box color={"red.500"}>
+        <FaAirbnb size={38} />
+    </Box>
+
+화면을 열고 닫을 때 토글기능을 사용할 수 있는 편리한 메서드가 있다.
+    useDisclosure()
+
+dark모드 기능을 제공해준다.
+    useColorMode : toggleColorMode로 클릭 이벤트 사용가능.
+    useColorModeValue(args1, args2): 첫 매개변수는 light모드일경우 두번째는 dark모드일경우 설정값을 넣어주면된다.
+
+Grid 생성 및 속성 부여
+    <Grid gap={10} templateColumns={"repeat(5, 1fr)"}> | gap:box간의 공간, templateColumns:box정렬방식,
+    1fr: gap을 제외한 최대한 채움
+
+templateColumns [prop]base: 안드로이드 사용자를 위한 설정값
+!!charkra자체가 모바일에 최적화된 라이브러리이다 보니 모바일에 최적화를 한 후 피시버전에 적용한다.
+    templateColumns={{
+        base: "1fr",
+        lg: "repeat(5, 1fr)",   >>> base가 안드로이드 이며 lg(largaScreen)이 설정이다.
+    }}
+
+로딩 화면을 설정할 수 있는 skeleton 컴포넌트를 사용한다.
+
+css속성을 사용하고 싶다면 '_'를 붙여서 css 컴포넌트를 사용하면 된다. 

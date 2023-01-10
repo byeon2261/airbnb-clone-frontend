@@ -1,0 +1,55 @@
+#####13 FRONT-END SETUP
+
+react-router-dom 동작 방식은 
+유저가 작성한 url을 보고 해당 라우터를 찾아서 컴포넌트를 보여준다.
+    / -> home
+
+하지만 6.4버젼부터는 작동방식이 조금 다르다.
+해당 url에서 파생된 페이지들을 자식 컴포넌트가 된다.
+    / -> home
+    /rooms -> Rooms  : 자식 컴포넌트
+가장 상위의 라우터를 가진 컴포넌트가 Root컴포넌트가 된다.
+    / -> Root
+root컴포넌트는 다른 모든 화면과 공유할 element를 둘 것이다.
+예를들어 header와 footer가 있다.
+
+
+src>router.tsx를 생성한다.
+createBrowserRouter를 사용하여 router를 생성한다.
+    const router = createBrowserRouter([
+    {
+        path: "/",
+    },
+    ]);
+
+components>Root.tsx를 생성하고 라우터에 컴포넌트를 추가 해준다.
+    export default function Root() {
+        return <h1>i am root</h1>;
+    }
+
+    {
+        path: "/",
+        element: <Root />,
+    },
+
+자식 element를 보여주고 싶다면 root.tsx에 <Outlet />태그를 추가해준다.
+    export default function Root() {
+    return (
+        <h1>
+            i am root
+            <Outlet />
+        </h1>
+    );
+    }
+
+errorelement를 사용하여 오류시 표기할 컴포넌트를 구현할 수 있다.
+
+component 명을 정할때는 무조건 첫자는 대문자야한다. 소문자일 경우 component로 인식을 하지 못한다.
+
+
+##### 19. React Query
+React Query를 사용하면 fetch도 편리하게 할 수 있으며 fetch한 데이터를 캐싱할 수 있다.
+
+useQuery는 차크라에도 존재하지만 교육에서는 react-query에 useQuery를 사용한다.
+
+useEffect() 안에 구현하는 함수는 api 호출할때 한번만 실행된다. state가 변경될때는 실행되지 않는다.
