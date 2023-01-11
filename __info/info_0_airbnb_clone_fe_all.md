@@ -61,3 +61,88 @@
             It's works!!
         </Text>
     이외에도 반응형 화면을 위한 문법이 있다.
+
+#### [1_React]
+
+    브라우져 탐색 표시줄에 나타날 URL을 리액트-라우터에 설명하는 작업을 진행한다. 해당 URL에 위치할 때 보여줄 컴포넌트를 선택해야 한다.
+    로직은 기존 라우터 5버젼과 같지만 그걸 설명하는 방식, 즉 API가 달라져서 코드가 약간 달라졌다.
+    src>router.ts 를 생성해준다.
+
+    기존에 5버젼에서 라우터를 구성하던 로직이다.
+    - src>router.ts -
+        <Router>
+            <Route path="/">
+                <Home>  # 컴포넌트
+            </Route>
+            <Route path="/movie/:id">
+                <MovieDetail>
+            </Route>
+        </Router>
+    url을 보내면 라우터에서 해당 url을 대조해서 해당하는 컴포넌트를 보내준다.
+    하지만 6.4버젼은 조금 다르다.
+    이번 프로젝트는 루트(홈) 컴포넌트를 생성한다. 루트 컴포넌트가 모는 컴포넌트의 상위컴포넌트가 될거다.
+    해당 컴포넌트위에 자식 컴포넌트가 상속받아 화면을 구성한다.
+
+    router.ts에서 라우터 컴포넌트를 가져와야하니 .tsx로 변경하며 components폴더를 생성하여 root.tsx를 생성해준다.
+    - src>components>root.tsx -
+        export default function Root() {
+           return <h1>I'm Root</h1>;
+        }
+
+    root를 router에 포함시켜준다. 6.4버젼으로 구성하겠다.
+    - src>router.tsx -
+        import { createBrowserRouter } from "react-router-dom";  # import는 태그를 완성하면 자동으로 import된다.
+        import Root from "./components/root";
+
+        const router = createBrowserRouter([  # 이안에 라우터 배열을 둘거다.
+            {
+                path: "/",
+                element: <Root />,
+            },
+        ]);
+
+    App.tsx는 삭제한다.
+    index.tsx에 App를 대신에 router를 구성한다.
+        import router from "./router";
+
+        root.render(
+            <React.StrictMode>
+                <ChakraProvider>
+                    <RouterProvider router={router} />  # RouterProvider로 공급 태그를 사용한다. router를 지정해야한다.
+                </ChakraProvider>
+            </React.StrictMode>
+        );
+    router가 import가 되지 않을 것이다. router를 export해줘야 한다.
+    - router -
+        ...
+        export default router;
+    router구성이 완료되었다. 브라우져에서 root에 등록한 텍스트가 표시된다.
+
+    해당 root에 header와 footer를 구성하며 다른 페이지에서 중간 화면을 렌더링하도록 구성하겠다.
+    src에 route폴더를 생성하여 home.tsx, users.tsx파일을 생성한다.
+        export default function  Home() {  # Users 도 같게 적용
+            return <span>...</span>;
+        }
+    router에 자식 컴포넌트로 추가해준다.
+        path: "/",
+        element: <Root />,
+        children: [
+            {
+                path: "",
+                element: <Home />,
+            },
+            {
+                path: "users",
+                element: <Users />,
+            },
+        ],
+    Root.tsx에 Outlet태그를 추가해준다.
+        export default function Root() {
+            return (
+                <h1>
+                    I'm Root
+                    <Outlet />  # children components가 여기에 적용된다.
+                </h1>
+            );
+        }
+    브라우져에 확인을 하면 URL에 따라 home 택스트와 users택스트가 추가된다.
