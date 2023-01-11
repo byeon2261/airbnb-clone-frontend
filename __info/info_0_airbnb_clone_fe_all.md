@@ -146,3 +146,56 @@
             );
         }
     브라우져에 확인을 하면 URL에 따라 home 택스트와 users택스트가 추가된다.
+
+
+    error페이지 컴포넌트를 생성하여 적용한다. route에 NotFound를 생성한다.
+    - src>routes>NotFound -
+        export default function NotFound() {
+            return <h1>Not Found</h1>;
+        }
+    - src>router -
+        const router = createBrowserRouter([
+        {
+            ...
+            errorElement: <NotFound />,
+        ...
+    페이지를 찾지 못할 경우 NotFound페이지를 렌더링한다.
+
+#### [2_chakra]
+
+    NotFound페이지를 chakra 태그로 구성해본다.
+        export default function NotFound() {
+            return (
+                <VStack>  # 수직방향으로 요소를 배열한다.
+                    <Heading>Page not found</Heading>  # 제목
+                    <Text>It's seems that you're lost.</Text>
+                    <Button>Go Home</Button>
+                </VStack>
+            );
+        }
+    기본 속성들로 제법 예쁘게 구성이 된다.
+
+    chakra는 기존 css속성을 단축해서 사용가능하다.
+
+<https://chakra-ui.com/docs/styled-system/style-props>
+
+        <VStack justifyContent={"center"} minH="100vh">  # minH: minHeight
+
+    차크라에 button에는 variant라는 속성이 있다.
+
+<https://chakra-ui.com/docs/components/button/usage#button-variants>
+
+    colorScheme, emoticon 등 기능이 있다.
+        <Button colorScheme={"red"} variant={"link"}>
+          Go Home &rarr;
+        </Button>
+
+[1_React]
+
+    button을 react-router-dom의 Link로 덮어준다.
+      <Link to="/">
+        <Button colorScheme={"red"} variant={"link"}>
+          Go Home &rarr;
+        </Button>
+      </Link>
+    버튼 클릭시 홈으로 이동한다.
