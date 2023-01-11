@@ -220,7 +220,7 @@
     $ npm install react-icons --save
 
     아이콘중 Font Awesome을 사용한다.
-        import { FaAirbnb } from "react-icons/fa";
+        import { FaAirbnb } from "react-icons/fa";  # 이모티콘을 추가할때에는 import를 한 후 태그를 써준다.
 
         ...
             <FaAirbnb />  # 사이트에서 복사한 태그명을 사용하면 된다.
@@ -242,9 +242,51 @@
                 <FaAirbnb size={"48"} />  # Font Awesome 태그. == 48px
             </Box>
             <HStack spacing={2}>  # spacing: 태그사이의 간격. == 2rem
+                <IconButton  # Icon을 넣는 버튼
+                    variant={"ghost"}
+                    aria-label="Toggle dark mode"
+                    icon={<FaMoon />}  # 태그형태로 넣어줘야 한다.
+                />
                 <Button>Log in</Button>
                 <Button colorScheme={"red"}>Sign in</Button>
             </HStack>
         </HStack>
     좌측엔 airbnb 아이콘, 우측엔 login과 sign up 버튼을 생성했다.
-    header 우측엔 다크/라이트화면 변경 버튼을 넣을 것이다.
+
+
+    log in 모달을 구현한다.
+    이제 모달을 생성하겠다. modal은 표현되는 부분이 아니며 데이터 변경만 하기때문에 위치는 중요하지 않다.
+        <Modal isOpen={false}></Modal>
+    모달을 변경시킬 함수를 생성한다.
+        const { isOpen, onClose, onOpen } = useDisclosure(); // react훅(chakra UI)
+    useDisclosure() 에서 'isOpen' boolean과 close, open 함수를 제공해준다.
+    modal을 구성해본다.
+        ...
+          <Button onClick={onOpen}>Log in</Button>
+        ...
+        <Modal onClose={onClose} isOpen={isOpen}>
+            <ModalOverlay />  # 페이지를 어둡게해서 model을 더 집중적으로 만들어준다.
+            <ModalContent>
+                <ModalHeader>Log In</ModalHeader>
+                <ModalBody>
+                    <Input variant={"filled"} placeholder={"Username"} />
+                    <Input variant={"filled"} placeholder={"Password"} />
+                    <Button colorScheme={"red"} w={"100%"}>  # w == wight. 길이를 모달창에 맞춘다.
+                        Log In
+                    </Button>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
+    modal이 생성되고 사라질때 애니메이션도 있다.
+    input들과 Button이 간격이 없다. stack태그로 감싸준다. input창에 이모티콘도 추가해준다.
+        <VStack>
+            <InputGroup>  # Input창안에 여러가지 요소를 넣을경우 사용한다. 요소간에 간격을 만들어 준다
+                <InputLeftElement ... children={<FaUserEdit />} />  # 이모티콘을 왼쪽에 추가해준다
+                <Input ... placeholder={"Username"} />
+            </InputGroup>
+            <InputGroup>
+                <InputLeftElement ... children={<FaLock />} />
+                <Input ... placeholder={"Password"} />
+            </InputGroup>
+            ...
+        </VStack>
