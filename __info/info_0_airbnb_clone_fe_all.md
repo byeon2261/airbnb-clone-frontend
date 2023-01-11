@@ -199,3 +199,52 @@
         </Button>
       </Link>
     버튼 클릭시 홈으로 이동한다.
+
+[2_Chakra]
+
+    root에 header를 생성한다.
+        export default function Root() {
+            return (
+                <Box>
+                    I'm Root
+                    <Outlet />
+                </Box>
+            );
+        }
+    해당 박스를 header로 구성해본다.
+    airbnb 아이콘을 넣어본다. react-icon에서 확인할 수 있다.
+
+<https://react-icons.github.io/react-icons/>
+
+    react-icon을 설치해준다.
+    $ npm install react-icons --save
+
+    아이콘중 Font Awesome을 사용한다.
+        import { FaAirbnb } from "react-icons/fa";
+
+        ...
+            <FaAirbnb />  # 사이트에서 복사한 태그명을 사용하면 된다.
+
+    색상 및 간격에 대한 chakra의 설정값들을 알고 사용하면 유용하다.
+    디자인이 흐트러지지않고 적용이 가능하다.
+
+<https://chakra-ui.com/docs/styled-system/theme>
+
+    root의 header를 구성해본다.
+        <HStack
+            justifyContent={"space-between"}
+            px={"5"}  # px == paddingX
+            py={"10"}  # px == paddingY
+            borderBottomWidth={1}  # border선이 밑에서만 굴기 1로 생성되면 색깔도 자동으로 gray.500으로 설정해준다.
+        >
+            <Box color={"red.500"}>  # Font Awesome태그는 chakra태그가 아니기때문에 color값을 #ffefd 스타일로 직접넣어줘야한다.
+                                     # 대신 Box 부모 태그를 만들어서 box에다 charkra color 속성을 적용해준다.
+                <FaAirbnb size={"48"} />  # Font Awesome 태그. == 48px
+            </Box>
+            <HStack spacing={2}>  # spacing: 태그사이의 간격. == 2rem
+                <Button>Log in</Button>
+                <Button colorScheme={"red"}>Sign in</Button>
+            </HStack>
+        </HStack>
+    좌측엔 airbnb 아이콘, 우측엔 login과 sign up 버튼을 생성했다.
+    header 우측엔 다크/라이트화면 변경 버튼을 넣을 것이다.
