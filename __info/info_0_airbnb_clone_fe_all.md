@@ -284,9 +284,70 @@
                 <InputLeftElement ... children={<FaUserEdit />} />  # 이모티콘을 왼쪽에 추가해준다
                 <Input ... placeholder={"Username"} />
             </InputGroup>
-            <InputGroup>
-                <InputLeftElement ... children={<FaLock />} />
-                <Input ... placeholder={"Password"} />
-            </InputGroup>
             ...
         </VStack>
+
+
+    sns 로그인 버튼을 구현한다. 구현 전 컴포넌트를 각 기능으로 분리하는 방식으로 리팩토링해보도록 하겠다.
+    header, log in, sns log in 등 각각 분리한다.
+    우선 소셜 로그인 부분부터 작업한다.
+        <HStack my={8}>  # 기존 로그인 컴포넌트와 sns로그인 버튼 간격을 둔다.
+            <Divider />  # 가로로 절취선같이 선이 나눠진다. #18.2 Sign Up Modal_1 이미지 참조
+            <Text
+                textTransform={"uppercase"}  # 대문자 변환
+                fontSize={"xs"}
+                as={"b"}  # bold체
+            >
+            ...
+            <Divider />  # 세로로 나누는 태그도 있다.
+        ...
+            <Button leftIcon={<FaGithub />} ...>  # 버튼에서는 ...Icon 속성을 사용하여 이미지를 넣을 수 있다
+            ...
+    설정 적용확인 후 절취선과 sns 로그인 버튼은 컴포넌트 분리를 한다. 해당 태그를 Box태그로 감싸서 새 컴포넌트에 옮겨준다.
+    scr/components/socialLogin.tsx 생성
+    - socialLogin -
+        export default function SocialLogin() {
+            return (
+                <Box mb={4}>
+                    ...root에 있던 sns로그인 코드
+                </Box>
+            );
+        }
+    root코드의 기존에 있던 코드가 비워진 곳에 새로 생성한 컴포넌트 태그를 사용한다.
+        ...
+        <SocialLogin />
+        ...
+    옮기기 전과 똑같이 동작하는 것을 확인한다.
+
+    같은 방식으로 login을 새로 컴포넌트를 생성하여 옮겨준다.
+        export default function LoginModal({onClose, isOpen}) {  # root에서 해당값을 받아와야한다.
+            return (
+                <Modal onClose={onClose} isOpen={isOpen}>
+                    ...
+                </Modal>
+    root에서 받을 값의 type을 정의하기 위한 interface를 구성한다.
+        interface LoginModalProps {
+            isOpen: boolean;
+            onClose: () => void;
+        }
+    type을 지정해준다.
+        ... LoginModal( {onClose, isOpen}:LoginModalProps )
+    root에서 해당 값을 보내줘야한다. root에 컴포넌트 태그를 추가해준다.
+        ...
+        <LoginModal isOpen={isOpen} onClose={onClose} />
+        ...
+
+    header도 새로 컴포넌트를 생성한다. useDisclosure 훅도 같이 옮겨준다.
+    작은것부터해서 큰것까지 전부 컴포넌트로 이동시켰다.
+
+    SignUpModal을 구현한다. SignUpModal은 LoginModal과 유사하기때문에 LoginModal을 복사해와서 변경한다.
+
+    root에서 훅에서 갖고온 변수 명을 변경하여 login과 signUp에 각각 넣어주자.
+        const {
+            isOpen: isLoginOpen,
+            onClose: onLoginClose,
+            onOpen: onLoginOpen,
+        } = useDisclosure();
+        ...
+            <Button onClick={onLoginOpen}>Log in</Button>
+            <LoginModal isOpen={isLoginOpen} onClose={onLoginClose} />
