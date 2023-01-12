@@ -351,3 +351,60 @@
         ...
             <Button onClick={onLoginOpen}>Log in</Button>
             <LoginModal isOpen={isLoginOpen} onClose={onLoginClose} />
+
+
+    다크모드 버튼을 구현한다. 다크모드를 사용할때 사용자의 셋팅값을 가져와서 보여주는 것과 상관없이 기본 default값을 보여주며 변경할지 결정해야한다.
+    src/theme.ts를 생성한다.
+        import { extendTheme, type ThemeConfig } from "@chakra-ui/react";  # type: 타입값만 상속한다
+
+        const config:ThemeConfig = {  # ThemeConfig 타입을 지정해주면 자동완성기능을 사용할 수 있다.
+            initialColorMode:"system"  # :<<< light, dark, system
+            useSystemColorMode: false,  # 유저의 시스템 색깔모드를 따라갈 것인지 정의. false로 해야 버튼으로 변경이 가능
+        }
+        const theme = extendTheme({ config });
+
+        export default theme;
+    해당 설정값을 chakraProvider의 속성에 넣어서 확장해준다.
+    - src.index -
+        ...
+        <ChakraProvider theme={theme}>  # theme를 import해준다.
+        ...
+    color mode sript를 추가한다. 해당 스크립트는 이전에 사용자가 선택한 색을 로컬 저장소에 저장한다.
+        ...
+        <ChakraProvider theme={theme}>
+            <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+        ...
+    브라우져에 local storage에서 color-mode값이 저장된다. 해당값을 삭제하고 theme에 color값을 변경하면 화면이 변경된다.
+    값을 변경해주는 toggle기능을 구현한다.
+        const { colorMode, toggleColorMode } = useColorMode();  # 훅
+
+        ...
+        <IconButton
+          onClick={toggleColorMode}
+          ...
+          icon={colorMode === "light" ? <FaMoon /> : <FaSun />}  # light일 경우 달 모양이다.
+        />
+    color mode에 따라 이모티콘이 변경된다.
+
+    component중 color mode가 변경되지 않길 원한다면 chakra에서 지원하는 light mode(or dark mode) 태그로 감싸주면 된다.
+        <LightMode>
+            ...
+        </LightMode>
+
+    특정 색깔모드일 때 색을 지정할 수 있다.
+    상단에 달모양과 해모양 이모티콘 변경하듯 속성을 변경하는 대신 chakra에서 이 기능을 대신할 hook이 있다.
+        # 첫번째 매개변수에는 light일때 두번째 매개변수는 dark일때 반환된다.
+        const logoColor = useColorModeValue("red.500", "red.200");
+
+        <Box color={logoColor}>
+            <FaAirbnb size={"48"} />
+        </Box>
+    다크모드 변경 아이콘도 훅을 이용하여 정의하도록 한다. componenet 는 대문자로 정의한다.
+        const Icon = useColorModeValue(FaMoon, FaSun);
+
+        <IconButton
+          ...
+          icon={<Icon />}
+        />
+    ! 컴포넌트는 대문자로 정의해야한다!
+     useColorMode() 에 colorMode는 이제 필요 없기때문에 삭제해준다.
