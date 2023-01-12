@@ -408,3 +408,15 @@
         />
     ! 컴포넌트는 대문자로 정의해야한다!
      useColorMode() 에 colorMode는 이제 필요 없기때문에 삭제해준다.
+
+
+    room을 보여줄 그리드를 구성한다.
+        # columnGap: x축 간격. rowGap: y축 간격. templateColumns: column을 격자로 생성해준다. (5, 1fr): 5컬럼을 최대크기로 배치
+        <Grid ... columnGap={4} rowGap={8} templateColumns={"repeat(5, 1fr)"}>
+            <VStack alignItems={"flex-start"}>  # 기본 중간정렬이다. flex-start로 앞으로 정렬
+                # hidden값을 부여해야 rounded값이 box안에 이미지에 적용된다.. rounded: border-radios기능
+                <Box overflow={"hidden"} ... rounded={"3xl"}>
+                ...
+                    <Grid gap={2} templateColumns={"6fr 1fr"}>  # 6:1 비율로 컬럼을 배치한다.
+                        <Text display={"block"}  noOfLines={1} ...>  # block why??. 텍스트가 일정이상 줄이 넘어가면 생략한다
+                    ...
