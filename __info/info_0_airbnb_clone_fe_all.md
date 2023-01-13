@@ -420,3 +420,63 @@
                     <Grid gap={2} templateColumns={"6fr 1fr"}>  # 6:1 비율로 컬럼을 배치한다.
                         <Text display={"block"}  noOfLines={1} ...>  # block why??. 텍스트가 일정이상 줄이 넘어가면 생략한다
                     ...
+
+
+    room 이미지 위에 하트 버튼을 생성한다.
+        <Box position={"relative"} ...>
+            <Button
+                variant={"unstyled"}
+                position="absolute"
+                top={2}  # 상단 우측
+                right={0}
+                color="white"
+            >
+                <FaRegHeart size="20px" />
+            </Button>
+        ...
+
+    그리드 화면 크기별 그리드 배열을 변경하는 기능을 구현한다.
+    그리드 안에 많은 배열값 함수를 생성하여 여러개 room객체를 생성한다.
+        <Grid ... >
+            {[
+                1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 3, 4, 5, 3, 4, 3, 4, 3, 4, 3, 3, 4, 3, 4, ...
+            ].map((index) => (
+                <VStack ...> ...  # 기존에 생성한 room
+            ))}
+        </Grid>
+    room객체가 여러개가 생성이된다.
+    크기별 객체 배열을 설정한다. 그리드에 속성을 변경한다.
+        <Grid
+            ...
+            templateColumns={{
+                base: "1fr",  # base: 차크라 자체가 안드로이드를 위해 만들어졌기 때문에 base는 안드로이드 화면 크기이다.
+                sm: "1fr",
+                md: "1fr 1fr",
+                lg: "repeat(3, 1fr)",  #  === "1fr 1fr 1fr"
+                xl: "repeat(4, 1fr)",
+                "2xl": "repeat(5, 1fr)",  # 일반 pc 풀화면 크기. 숫자가 들어갈경우에는 ""으로 묶어줘서 str으로 보내준다.
+            }}
+        >
+    화면 크기가 변경될 때마다 그리드 표시가 변경된다.
+
+    화면이 변경될때 header의 요소들이 위치가 고정되어있다. header요소들도 화면크기에 따라 속성이 변경되도록 적용한다.
+        <Stack  # direction을 변경하기 위해서 VStack에서 Stack으로 변경한다. Stack은 기본 가로모드이다.
+            alignItems="center"
+            direction={{
+                sm: "column",  # 세로로 배열
+                md: "row",  # 가로
+            }}
+            spacing={{
+                sm: 4,  #세로로 배열시 간격을 두기 위함
+                lg: 0,
+            }}
+            ...
+        >
+
+    home에서 작성한 room코드는 room컴포넌트로 옮긴다.
+    src/components/Room.tsx 생성.
+
+    다크모드일때 텍스트 색을 일부 수정한다.
+        const gray = useColorModeValue("gray.600", "gray.300");
+
+        <Text fontSize={"sm"} color={gray}>  # "gray.600" -> gray. 다크모드일때 잘 안보인다.
