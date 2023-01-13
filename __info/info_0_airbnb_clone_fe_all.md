@@ -480,3 +480,17 @@
         const gray = useColorModeValue("gray.600", "gray.300");
 
         <Text fontSize={"sm"} color={gray}>  # "gray.600" -> gray. 다크모드일때 잘 안보인다.
+
+
+    이번엔 로딩화면을 구성한다. 최근 페이스북이나 인스타그램 등 사이트에서 자주 사용되는 skelton을 사용해 본다.
+    - routes/hoem -
+        <Box>
+            <Skeleton rounded={"2xl"} mb={8} h="260" />  # 이미지 크기와 같게 생성된다.
+            <SkeletonText noOfLines={2} w={"90%"} mb={5} /> # 텍스트라인으로 생기는 뼈대이다. 기본값은 3줄이다.
+            <SkeletonText noOfLines={1} w={"40%"} />
+        </Box>
+
+    room객체에 별점에 마우스를 올려놓으면 색깔이 변경되는 기능을 구현 한다.
+        <HStack _hover={{ color: "red.100" }} ...>  # _를 쓰고 css에서 사용하던 에니매이션 기능을 사용할 수 있다.
+
+    이제 API에서 데이터를 가져오는 것을 진행할 것이다.
