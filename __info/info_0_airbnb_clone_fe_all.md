@@ -621,7 +621,7 @@ api.ts를 생성하여 api를 패치하기 위한 함수를 다 옮겨준다.
 
     const BASE_URL = "http://127.0.0.1:8000/api/v2/";
 
-    export async function getRooms() {
+    export async function getRooms() {  # async: 로딩중인지 확인하기위해 싱크
         const response = await fetch(`${BASE_URL}rooms/`);
         const json = await response.json();
         return json;
@@ -648,3 +648,36 @@ home에 State소스와 useEffect 소스를 삭제하고 useQuery훅을 사용한
     {data?.map((room) => (  # rooms -> data  # data?: data는 null일 수 있다. ?를 붙여준다.
         ...
     ))}
+
+### 19.3 Axios
+
+#### [1_React]
+
+fetch하고 url이 확인하는 기능을 대신하여 axios를 설치한다. axios는 fetch adapter같은 거다.
+
+    $ npm i axios
+
+fetch대신 axios를 넣어준다.
+
+    import axios from "axios";
+
+    export async function getRooms() {
+        const response = await axios.get(`${BASE_URL}rooms/`);
+        return response.data;  # json data
+    }
+
+axios에 base url을 지정하여 관리할 수 있다.
+
+    const instance = axios.create({
+        baseURL: "http://127.0.0.1:8000/api/v2/",
+    });
+
+    export async function getRooms() {
+        const response = await instance.get("rooms/");  # base_url에 더해져 url이 형성된다.
+        return response.data;
+    }
+
+getRooms()를 화살표 함수로 함축해본다.
+
+    export const getRooms = () =>
+        instance.get("rooms/").then((response) => response.data);
