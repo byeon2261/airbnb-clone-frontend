@@ -11,7 +11,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import LoginModal from "./loginModal";
-import SignUpModal from "./SignUpModal";
+import SignUpModal from "./signUpModal";
 
 export default function Header() {
   const {

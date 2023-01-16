@@ -494,3 +494,99 @@
         <HStack _hover={{ color: "red.100" }} ...>  # _를 쓰고 css에서 사용하던 에니매이션 기능을 사용할 수 있다.
 
     이제 API에서 데이터를 가져오는 것을 진행할 것이다.
+
+## 19 React Query
+
+#### [1_React]
+
+    room url을 fetch한다.
+    - src/routes/home -
+        import { useEffect } from "react";
+
+        useEffect(() => {
+            fetch("http://127.0.0.1:8000/api/v2/rooms/");  # url 끝에 /를 붙여줘야한다.
+        }, []);
+    react 프로젝트를 실행하면 검사창에서 CORS에러가 발생한다. 서버가 사용자에게 서버로부터 무언가를 fetch하는 것을 허용하지 않는다는 것이다.
+
+#### backend.[2_Django]
+
+    backend셋팅을 한다. aribnb-clone-backend/info/info_0_airbnb_clone_all.md 참조
+    ...
+    백엔드 셋팅이 완료되면 console창에 CORS에러가 발생하지 않는다. 네트워크에서도 fetch에러가 발생하지 않아야한다.
+    # #19.0 Manual Fetching_1 참조
+
+    앞서 만든 fetch를 State에 넣는다. 로딩중인 state와 room데이터를 보여줄 state를 생성해야한다.
+        const [isLoading, setIsLoading] = useState(true);
+        const [rooms, setRooms] = useState();  # (): undefined
+        const fetchRooms = async () => {
+            const response = await fetch("http://127.0.0.1:8000/api/v2/rooms/");
+            const json = await response.json();
+            setRooms(json);
+            setIsLoading(false);
+        };
+        useEffect(() => {
+            fetchRooms();
+        }, []);
+        return (
+            <Grid ...>
+                {isLoading ? (
+                    <>
+                        <RoomSkeleton />
+                        <RoomSkeleton />
+                        <RoomSkeleton />
+                        ...
+                    </>
+                ) : null}
+            </Grid>
+        )
+    이건 예전의 fetch방식이다.
+    이렇게 하나의 컴포넌트로 데이터를 fetch할 수 있지만 애플리케이션의 규모가 커지면 다른방법이 필요하다.
+    그 방법은 다음에 변경하고 room데이터를 가져오겠다.
+        {rooms.map((room) => (
+            <Room />
+        ))}
+    화면변경없이 잘 나온다
+
+    이젠 실제 데이터를 표현하도록 하겠다.
+    이제 prop로 실제 데이터를 가져온다.
+    - components/room -
+        interface RoomProps {
+            imgUrl: string;
+            name: string;
+            rating: number;
+            ...
+        }
+        export default function Room({
+            imgUrl,
+            name,
+            rating,
+            ...
+        }: RoomProps) {
+            ...
+            <Image src={imgUrl} ... />  # {}: 변수값
+            ...
+    데이터를 다 변경한다.
+    home state에서 데이터를 보내준다.
+        interface IPhoto {  # photos array 정의
+            pk: number;
+            file: string;
+            description: string;
+        }
+
+        interface IRoom {
+            pk: number;
+            name: string;
+            ...
+            photos: IPhoto[];  # Photo interface
+        }
+        ...
+            const [rooms, setRooms] = useState<IRoom[]>([]);
+            ...
+                {rooms.map((room) => (
+                    <Room
+                        imgUrl={rooms.photos[0]}
+                        name={room.name}
+                        rating={room.rating}
+                        ...
+                    />
+                ))}
