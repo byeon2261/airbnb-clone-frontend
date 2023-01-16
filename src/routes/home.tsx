@@ -1,9 +1,8 @@
 import { Grid } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
 import { getRooms } from "../api";
-import Room from "../components/room";
-import RoomSkeleton from "../components/roomSkeleton";
+import Room from "../components/Room";
+import RoomSkeleton from "../components/RoomSkeleton";
 
 interface IPhoto {
   pk: number;
@@ -56,7 +55,6 @@ export default function Home() {
           <RoomSkeleton />
         </>
       ) : null}
-      <Link to="/2343243">404</Link>
       {data?.map((room) => (
         <Room
           imgUrl={room.photos[0].file}
@@ -65,6 +63,7 @@ export default function Home() {
           city={room.city}
           country={room.country}
           price={room.price}
+          pk={room.pk}
         />
       ))}
     </Grid>

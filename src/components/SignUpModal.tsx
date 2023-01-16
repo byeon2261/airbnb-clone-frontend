@@ -12,7 +12,7 @@ import {
   ModalOverlay,
   VStack,
 } from "@chakra-ui/react";
-import SocialLogin from "./socialLogin";
+import SocialLogin from "./SocialLogin";
 
 interface SignUpModalProps {
   isOpen: boolean;

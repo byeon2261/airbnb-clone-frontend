@@ -681,3 +681,71 @@ getRooms()를 화살표 함수로 함축해본다.
 
     export const getRooms = () =>
         instance.get("rooms/").then((response) => response.data);
+
+### 19.4 Room Detail
+
+#### [1_React]
+
+react-router의 Link를 사용하여 room앱을 감싼다.
+@src/components/room.tsx
+
+    export default function Room(
+        ...
+    ) {
+    return (
+        <Link to={"[임의의 url]"}>
+            <VStack alignItems={"flex-start"}>
+                ...
+            </VStack>
+        </Link>
+
+브라우져에서 room 객체를 클릭하면 not found화면으로 이동된다.
+home에서 pk데이터를 room에 전달하여 url에 추가해준다.
+
+    <Link to={`/rooms/${pk}`}>
+
+room객체를 클릭하면 url이 해당 pk값이 포함되어 변경되는 것이 확인된다.
+해당 url의 RoomDetail 페이지를 생성한다.
+@src/routes/RoomDetail.tsx
+
+    export default function RoomDetail() {
+        return <h1>hello!!</h1>;
+    }
+
+@src/router
+
+    children: [
+      ... ,
+      {
+        path: "rooms/:roomPk",
+        element: <RoomDetail />,
+      },
+
+home화면에서 room객체를 선택하면 RoomDetail화면으로 이동된다.
+
+useParams() 훅을 사용하여 url에 있는 모든 변수를 가져온다.
+@src/routes/RoomDetail
+
+    export default function RoomDetail() {
+        const params = useParams();
+        console.log(params);
+        ...
+    }
+
+router에서 특정 pk를 전송하면서 해당 pk로 파라미터를 가져온다.
+해당 파라미터로 fetch하는 함수를 생성한다.
+
+데이터를 가져오기 전에 backend쪽에 작업이 필요하다.
+...
+
+api.ts에 임의의 pk로 함수를 생성한다.
+
+    export const getRoom = () =>
+        instance.get(`rooms/11`).then((response) => response.data);
+
+fetch함수로 roomdetail에서 값을 가져온다.
+@routes/RoomDetail
+
+    const {isLoading, data} = useQuery([`room:${roomPk}`], getRoom);
+
+data변수에 backend model에 있는 데이터를 가져온다.

@@ -10,8 +10,8 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
-import LoginModal from "./loginModal";
-import SignUpModal from "./signUpModal";
+import LoginModal from "./LoginModal";
+import SignUpModal from "./SignUpModal";
 
 export default function Header() {
   const {
