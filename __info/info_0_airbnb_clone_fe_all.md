@@ -590,3 +590,61 @@
                         ...
                     />
                 ))}
+
+### 19.2 React Query
+
+#### [1_React]
+
+예전에 react query라고 불렸던 tenstack query를 설치하여 사용한다. (이름을 변경)
+
+<https://tanstack.com/query/latest/docs/react/installation>
+
+    $ npm i @tanstack/react-query
+
+tanstack의 QueryClientProvider로 기존 앱을 감싸준다.
+@src/index.tsx
+
+    import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+    const client = new QueryClient();
+        ...
+        root.render(
+            <React.StrictMode>
+                <QueryClientProvider client={client}> # 앱을 감싸준다.
+                    ...
+                <QueryClientProvider>
+            ...
+
+react query를 사용하면 캐싱을 저장하여 다시 화면으로 돌아올때 다시 fetch를 하며 로딩이 하지않고 바로 화면을 보여준다.
+api.ts를 생성하여 api를 패치하기 위한 함수를 다 옮겨준다.
+@src/api.ts
+
+    const BASE_URL = "http://127.0.0.1:8000/api/v2/";
+
+    export async function getRooms() {
+        const response = await fetch(`${BASE_URL}rooms/`);
+        const json = await response.json();
+        return json;
+    }
+
+src/routes/home의 소스를 옮겨준다.
+home에 State소스와 useEffect 소스를 삭제하고 useQuery훅을 사용한다.
+
+    import { useQuery } from "@tanstack/react-query";
+    import { getRooms } from "../api";
+
+    export default function Home() {
+        # isLoading: 로딩중일 경우 true를 받음. data:json데이터. ["rooms"]: 데이터를 찾는 키, 해당 키로 값을 찾아올 수 있음.
+        const { isLoading, data } = useQuery(["rooms"], getRooms);  # rooms이름 아래로 데이터들이 저장된다.
+        ...
+        {data.map((room) => (  # rooms -> data
+            ...
+        ))}
+
+코드를 작성하면 room 타입이 지정되지않아서 요류가 발생한다.
+
+    const { isLoading, data } = useQuery<IRoom[]>(["rooms"], getRooms);
+    ...
+    {data?.map((room) => (  # rooms -> data  # data?: data는 null일 수 있다. ?를 붙여준다.
+        ...
+    ))}
