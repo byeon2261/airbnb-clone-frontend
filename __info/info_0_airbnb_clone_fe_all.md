@@ -689,6 +689,8 @@ getRooms()를 화살표 함수로 함축해본다.
 react-router의 Link를 사용하여 room앱을 감싼다.
 @src/components/room.tsx
 
+    import { Link } from "react-router-dom";
+
     export default function Room(
         ...
     ) {
@@ -749,3 +751,59 @@ fetch함수로 roomdetail에서 값을 가져온다.
     const {isLoading, data} = useQuery([`room:${roomPk}`], getRoom);
 
 data변수에 backend model에 있는 데이터를 가져온다.
+
+### 19.5 Devtools and Query Keys
+
+tanstack의 devtool을 을 이용하여 query 변수가 어떻게 함수로 이동하는 알 수 있다.
+devtool을 설치한다.
+
+<https://tanstack.com/query/v4/docs/react/devtools>
+
+    $ npm i @tanstack/react-query-devtools
+
+root.tsx에 devtool을 import 한다.
+
+    import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+    ...
+        return (
+            <Box>
+                ...
+                <ReactQueryDevtools />
+            </Box>
+        ...
+
+app을 실행하면 브라우져 왼쪽 하단에 꽃모양 버튼이 생성된다. 클릭하면 캐시에 저장된 query를 확인 할 수 있다.
+
+변수를 fetch함수로 보내는 방법을 적용해본다. room데이터를 받을때 2개의 array로 값을 받도족 적용하겠다.
+
+    const { isLoading, data } = useQuery([`rooms`, roomPk], getRoom);
+
+아직까지 getRoom에서 데이터를 받을 공간이 없어서 만들어 줘야한다. useQuery가 getRoom을 호출할때 매게변수를 보내준다.
+@src/api.ts
+
+    export const getRoom = (someting) =>
+        ...
+        console.log(someting)  // >>>: {queryKey: Array(2), pageParam: undefined, meta: undefined}
+                                        queryKey: Array(2)
+                                            0: "rooms"
+                                            1: undefined
+                                            length: 2
+                                            ...
+
+queryKey 배열에 1번에 값을 찾지 못하고 있다.
+@src/router path속성값이 rooms/:room_pk로 되어 있으면서 변수명이 일치하지 않아 찾지 못했었다. roomPk로 변경.
+
+매개변수에서 queryKey값만 가져오도록 하겠다. 인수타입은 react-query에 가져와서 사용한다. 데이터 전송에 해당 queryKey의 pk를 보내준다.
+
+    import { QueryFunctionContext } from "@tanstack/react-query";
+
+    export const getRoom = ({queryKey}:QueryFunctionContext) =>
+        instance.get(`rooms/${queryKey[1]}`).then...
+
+pk값을 변수에 저장하여 값의 의미를 남겨놓도록 적용하는 것이 좋다.
+
+    const [_, roomPk] = queryKey;  // array의 길이가 2이다.
+    instance.get(`rooms/${roomPk}`).then...
+
+적용 후 브라우져에서 확인을 하면 devtools의 Data Explorer에서 데이터를 확인 할 수 있다. #19.5 Devtools and Query Keys_1 참조
