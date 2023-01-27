@@ -807,3 +807,73 @@ pk값을 변수에 저장하여 값의 의미를 남겨놓도록 적용하는 �
     instance.get(`rooms/${roomPk}`).then...
 
 적용 후 브라우져에서 확인을 하면 devtools의 Data Explorer에서 데이터를 확인 할 수 있다. #19.5 Devtools and Query Keys_1 참조
+
+### 19.6 Photos Grid
+
+#### [2_Chakra]
+
+타입을 정의한 파일을 따로 생성하여 모든 타입을 그 파일에 정의 하겠다. @src/type.d.ts를 생성하여 모든 type을 정의한다.
+
+기존에 Home.tsx의 타입정의 코드를 삭제하고 type.d를 import하여 타입을 지정한다.
+
+    import { IRoomList } from "../type";
+
+    export default function Home() {
+        ... = useQuery<IRoomList[]>...
+
+RoomDetail에도 적용해준다.
+
+detail화면을 구성하는데 skeleton기능도 넣어준다.
+
+    <Skeleton h={"43px"} w={"50%"} isLoaded={!isLoading}>
+        <Heading>{data?.name}</Heading>
+    </Skeleton>
+
+하단 별점, 지역 및 share, like 버튼도 생성한다.
+
+detail화면에서 방 사진을 5개 가져온다.
+
+    <Grid
+        mt={4}
+        h="60vh"
+        templateRows={"1fr 1fr"}  // 탬플릿아이템이 1:1 비율로 생성
+        templateColumns={"repeat(4, 1fr)"}
+    >
+        {data?.photos.slice(0, 5).map((photo) => (  // slice(start, end): 아이템을 일부만 가져온다.
+            <Box overflow={"hidden"} key={photo.pk}>
+                <Image w={"100%"} h={"100%"} src={photo.file} />  // w,h=100%: templateRows 속성에 맞게 적용하기위해 사용
+            ...
+
+detail화면에서 방 사진을 5개를 표시하는데 대표사진을 크게 하나 보여주고 오른쪽으로 남은 4개 사진을 합친 크기가 대표사진 크기와 같게 표현한다.
+GridItem을 사용해준다.
+
+    <GridItem
+        colSpan={index === 0 ? 2 : 1}  // column 길이
+        rowSpan={index === 0 ? 2 : 1}  // row 길이
+        overflow={"hidden"}
+        key={photo.pk}
+    >
+        <Image objectFit={"cover"} w={"100%"} h={"100%"} src={photo.file} />
+    </GridItem>
+
+사진 폼 끝부분을 rounded준다.
+
+    <Grid
+        ...
+        rounded="lg"
+        overflow={"hidden"}
+    >
+
+room img도 skeleton기능을 구현한다. 데이터가 들어오기전에 생성되어야하기때문에 임의 list를 만들어서 skeleton을 생성한다.
+
+    {[0, 1, 2, 3, 4].map((index) => (
+        <GridItem
+            ...
+            key={index}
+        >
+            <Skeleton h={"100%"} w={"100%"} isLoaded={!isLoading}>
+                <Image
+                    ...
+                    src={data?.photos[index].file}
+                />
+            ...

@@ -10,16 +10,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-
-interface IRoomProps {
-  imgUrl: string;
-  name: string;
-  rating: number;
-  city: string;
-  country: string;
-  price: number;
-  pk: number;
-}
+import { IRoomProps } from "../type";
 
 export default function Room({
   imgUrl,
