@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Grid,
@@ -9,17 +10,21 @@ import {
   Skeleton,
   Text,
   useColorModeValue,
+  VStack,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { FaRegHeart, FaShareSquare, FaStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { getRoom } from "../api";
-import { IRoomDetail } from "../type";
+import { getRoom, getRoomReviews } from "../api";
+import { IReview, IRoomDetail } from "../type";
 
 export default function RoomDetail() {
   const { roomPk } = useParams();
   const { isLoading, data } = useQuery<IRoomDetail>([`rooms`, roomPk], getRoom);
   const gray = useColorModeValue("gray.600", "gray.300");
+  const { isLoading: reviewsIsLoading, data: reviewsData } = useQuery<
+    IReview[]
+  >([`rooms`, roomPk, `reviews`], getRoomReviews);
   return (
     <Box
       mt={10}
@@ -27,8 +32,6 @@ export default function RoomDetail() {
         base: 10,
         lg: 40,
       }}
-      // columnGap={4}
-      // rowGap={8}
     >
       <Skeleton h={"43px"} w={"50%"} isLoaded={!isLoading}>
         <Heading>{data?.name}</Heading>
@@ -85,6 +88,41 @@ export default function RoomDetail() {
           </GridItem>
         ))}
       </Grid>
+      <HStack w={"40%"} justifyContent={"space-between"} mt={10}>
+        <VStack alignItems={"flex-start"}>
+          <Skeleton h={"29px"} isLoaded={!isLoading}>
+            <Heading fontSize={"2xl"}>
+              House Hosted by {data?.owner.name}
+            </Heading>
+          </Skeleton>
+          <Skeleton h={"24px"} isLoaded={!isLoading}>
+            <HStack justifyContent={"flex-start"} w={"100%"}>
+              <Text>
+                {data?.toilets} toilet{data?.toilets === 1 ? "" : "s"}
+              </Text>
+              <Text>•</Text>
+              <Text>
+                {data?.rooms} room{data?.rooms === 1 ? "" : "s"}
+              </Text>
+            </HStack>
+          </Skeleton>
+        </VStack>
+        <Avatar name={data?.owner.name} size={"xl"} src={data?.owner.avatar} />
+      </HStack>
+      <Box mt={10}>
+        <Heading fontSize={"2xl"}>
+          <Skeleton w={"40%"} isLoaded={!isLoading}>
+            <HStack>
+              <FaStar />
+              <Text>{data?.rating}</Text>•
+              <Text>
+                {reviewsData?.length} review
+                {reviewsData?.length === 1 ? "" : "s"}
+              </Text>
+            </HStack>
+          </Skeleton>
+        </Heading>
+      </Box>
     </Box>
   );
 }

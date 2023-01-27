@@ -877,3 +877,82 @@ room img도 skeleton기능을 구현한다. 데이터가 들어오기전에 생�
                     src={data?.photos[index].file}
                 />
             ...
+
+### 19.7 Reviews
+
+#### [2_Chakra]
+
+room img 및에 방 제목과 toilet, room 개수를 표시하는 칸을 생성한다.
+
+    <HStack mt={10}>  // 이미지는 가로정렬
+        <VStack>  // 나머지 데이터는 세로 정렬
+          <Heading fontSize={"2xl"}>House Hosted by {data?.owner.name}</Heading>
+          <HStack justifyContent={"flex-start"} w={"100%"}>  // 속성을 사용하지 않으면 중간에서 시작한다.
+            <Text>
+              {data?.toilets} toilet{data?.toilets === 1 ? "" : "s"} // 두개이상일경우 "s"를 붙여준다.
+            </Text>
+            <Text>•</Text>
+            <Text>
+              {data?.rooms} room{data?.rooms === 1 ? "" : "s"}
+            </Text>
+          </HStack>
+        </VStack>
+      </HStack>
+
+Avatar 컴포넌트를 사용하여 avatar를 표시해준다.
+
+    <HStack ...>
+        ...
+        //이미지를 로드해오지 못할 경우 name 속성을 표기해준다.
+        <Avatar name={data?.owner.name} size={"xl"} src={data?.owner.avatar} />
+    ...
+
+skeleton을 구성한다. headgin과 Text를 감싸준다.
+
+    <HStack ...>
+        <VStack alignItems={"flex-start"}>
+            <Skeleton h={"29px"} isLoaded={!isLoading}>
+                ...
+            </Skeleton>
+            <Skeleton ...>
+                ...
+
+이제 이 review페이지를 위한 fetch코드를 추가한다.
+
+@src/api. 기존 getRooom에서 reviews로 가는 것 말고는 같다.
+
+    ...
+    return instance
+        .get(`rooms/${roomPk}/reviews`)
+        ...
+    };
+
+@src/routes/RoomDetail
+
+    const { isLoading: reviewsIsLoading, data: reviewsData } = useQuery(  // 이미 변수명이 있기때문에 변경
+        [`rooms`, roomPk, `reviews`],
+        getRoomReviews
+    );
+
+review데이터를 roomDetail 하단에 구현한다.
+
+    <Box mt={10}>
+        <Heading fontSize={"2xl"}>
+            <HStack>
+                <FaStar />
+                <Text>{data?.rating}</Text>
+            </HStack>
+        </Heading>
+    </Box>
+
+reviews의 수를 표시할려고 한다. reviews.length를 사용하기 위해서는 reviews의 타입이 정의 되어야 한다.
+
+@src/type
+
+    export interface IReview {
+        ...
+    }
+
+@src/routes/roomDetail
+
+    ... = useQeury<IReview>(...)

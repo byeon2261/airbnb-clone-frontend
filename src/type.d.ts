@@ -45,7 +45,7 @@ export interface IRoomDetail extends IRoomList {
   amenities: IAmenity[];
 }
 
-interface IRoomProps {
+export interface IRoomProps {
   imgUrl: string;
   name: string;
   rating: number;
@@ -53,4 +53,10 @@ interface IRoomProps {
   country: string;
   price: number;
   pk: number;
+}
+
+export interface IReview {
+  payload: string;
+  rating: number;
+  user: IRoomOwner;
 }
