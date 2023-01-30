@@ -973,3 +973,76 @@ grid가 커서 컬럼간의 간격이 넓다. grid를 container 컴포넌트에 
     <Container MarginX="none">  // 가로정렬이 가운데로 되어 있다.
         <Grid ...>
         ...
+
+## 20 Authentication
+
+### 20.0 useUser
+
+header에서 authentication을 알 수 있도록 구현한다. hook을 만들어서 로그인 여부를 알려주도록 하겠다.
+
+fetcher function을 생성한다.
+@src/api.ts
+
+    export const getMe = () =>
+        instance.get(`user/me`).then((response) => response.data);
+
+src/lib 폴더를 생성한다. useUser hook을 생성해준다.
+
+@src/lib/useUser.ts, error까지 사용해준다.
+
+    export default function useUser() {
+        const { isLoading, data, error } = useQuery(["me"], getMe);
+        console.log(error);
+        return;
+    }
+
+@src/components/header 에 useUser훅을 추가해준다.
+
+    useUser()
+
+header 컴포넌트는 어디에서든 호출이 되니 아무 페이지에서 확인 할 수 있다. #20.0 useUser_1 참조
+
+error대신 isError를 사용하겠다. isError는 error여부에 따라 boolean값을 반환한다.
+
+return값에 object를 반환하겠다. key와 value값이 같가면 변수명처럼 보내줄 수 있다.
+
+    isLoading: isLoading, -> isLoading,
+    user: data,
+    isLoggedIn: !isError,  // isError가 false일때 에러가 없기때문에 로그인이 되었다고 판단.
+
+Header에 user로그인이 되었다면 login sign up버튼을 안보이도록 적용한다.
+
+        {!userLoading && !isLoggedIn ? (
+          <>  // fragment. 하나의 엘리멘트만 전송이 가능해서 묶어준다.
+            <Button onClick={onLoginOpen}>Log in</Button>
+            <LightMode>
+              <Button onClick={onSignUpOpen} colorScheme={"red"}>
+                Sign up
+              </Button>
+            </LightMode>
+          </>
+        ) : (
+          <Avatar />
+        )}
+
+테스트를 해보면 error가 발생하기 전까지 아바타 이모티콘이 나오다가 login버튼이 나온다. react는 기본으로 fetch를 실패해도 3번을 시도한다.
+시도하는 동안 로그인버튼 대신 아바타가 보인다. 로그인 시도가 아닌 유저 데이터를 가져오는 것은 재시도를 하지 않도록 적용하기로 하겠다.
+
+    useQuery(..., {
+        retry: false,
+    })
+
+이제 바로 로그인 버튼이 나오게 된다.
+
+로딩하는 동안 Avatar 모양이 나오지 않다록 하기 위해서 if문을 변경한다.
+
+    {!userLoading ? (
+        !isLoggedIn ? (
+            <>
+                ...
+            </>
+        ) : null
+    ) : (
+        ...
+
+적용 후 python서버에 로그인을 해도 로그인정보를 가져오지 못한다. 해당부분 수정을 진행하도록 하겠다.

@@ -48,6 +48,7 @@ export default function Home() {
           country={room.country}
           price={room.price}
           pk={room.pk}
+          key={room.pk}
         />
       ))}
     </Grid>
