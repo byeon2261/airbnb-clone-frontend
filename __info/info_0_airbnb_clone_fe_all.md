@@ -956,3 +956,20 @@ reviews의 수를 표시할려고 한다. reviews.length를 사용하기 위해�
 @src/routes/roomDetail
 
     ... = useQeury<IReview>(...)
+
+### 19.8 Conclusions
+
+Review칸을 구성해본다. 화면에 2개 리뷰 컬럼이 놓아지고 정렬되는 방식으로 구현한다.
+
+    <Grid gap={5} templateColumns={"1fr 1fr"}>
+        {reviewsData?.map((review, index) => (
+            <VStack alignItems={"flex-start"} key={index}>
+                ...
+
+컬럼을 구성한다.
+
+grid가 커서 컬럼간의 간격이 넓다. grid를 container 컴포넌트에 넣어준다.
+
+    <Container MarginX="none">  // 가로정렬이 가운데로 되어 있다.
+        <Grid ...>
+        ...
