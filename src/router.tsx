@@ -6,12 +6,12 @@ import RoomDetail from "./routes/RoomDetail";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/api/v2/",
     element: <Root />,
     errorElement: <NotFound />,
     children: [
       {
-        path: "",
+        path: "rooms",
         element: <Home />,
       },
       {
