@@ -1174,3 +1174,16 @@ toast update()를 통해 toast변경이 가능하다. 임의로 딜레이 시간
             ...  // 변경될 속성들
         })
     }, 5000)
+
+# ! MenuButton의 Avatar를 클릭시 css 경고 메세지
+
+    MenuButton의 Avatar를 클릭시 css 경고 메세지가 발생한다.
+
+    >>>: createPopper.js:110 Popper: CSS "margin" styles cannot be used
+    to apply padding between the popper and its reference element or
+    boundary. To replicate margin, use the `offset` modifier, as well
+    as the `padding` option in the `preventOverflow` and `flip` modifiers.
+
+    HStack대신에 Flex를 사용하여 해결이 가능하다.
+
+<https://github.com/kjh910/airbnb-clone/blob/1a1db114aba436790eab8e166454ca3c8bc3a8f2/airbnb-clone-frontend/app/src/components/organisms/header/header.tsx#L67>
