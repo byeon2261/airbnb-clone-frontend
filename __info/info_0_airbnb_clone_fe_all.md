@@ -1105,3 +1105,72 @@ Django 적용 후 react페이지에서 로그인확인이 가능하다.
 
     두 페이지를 사용하는 브라우져가 같아야 인증에 문제가 발생하지 않는다고 한다.
     내 프로젝트 작업을 진행하는 동안에는 문제가 발생하지 않았다.
+
+### 20.3 Log Out
+
+로그아웃 기능을 구현한다. 우선 menu, menubutton 컴포넌트로 header의 avatar을 감싸준다.
+
+@src/components/header
+
+    <Menu>
+        <MenuButton>
+            <Avatar ... />
+        </MenuButton>
+        <MenuList>
+            <MenuItem>Log out</MenuItem>
+        </MenuList>
+    </Menu>
+
+구현 후 Avatar를 클릭하면 리스트처럼 하단에 Log out이 나온다.
+
+(Django서버 users/urls에 'log-out'이 생성되어 있다. post()로 logout기능이 구현되어 있다.)
+버튼 클릭시 Django서버에 로그아웃 프로토콜을 보내면 된다.
+
+@src/api.ts
+
+    export const logOut = () =>
+        instance.post("users/log-out").then((response) => response.data);
+
+@src/components/header
+
+    <MenuItem onclick={logOut}>...</MenuItem>
+
+logOut 데이터를 담는 onLogOut()를 생성해준다.
+
+    const onLogOut = async () => {
+        const data = await logOut();
+        console.log(data);
+    };
+
+# ! console에 요청 실패 오류메세지
+
+    console에 요청 실패 오류메세지가 발생한다고 하는데 본인이 테스트를 진행하면 오류가 발생하지 않음.
+    로그아웃은 되지 않지만 {"ok", "bye"}가 리턴된다.
+
+다음 강의에 요청실패하는 원인과 해결을 알려준다고 하니 대기.
+
+Toast hook을 사용하여 authentication을 알려주는 기능을 구현한다.
+
+<https://chakra-ui.com/docs/components/toast>
+
+    const onLogOut = async () => {
+        toast({
+            title: "Good bye!!",
+            description: "Log out Completed.",
+            status: "success",  // toast body색상, 아이콘이 변경된다.
+            isClosable: true,  // 종료 아이콘이 생성된다.
+            duration: 6000,  // 6초 뒤에 사라진다.
+        });
+    };
+
+toast update()를 통해 toast변경이 가능하다. 임의로 딜레이 시간을 줘서 테스트를 진행한다.
+
+    const toastId = toast({
+        ...
+    })
+
+    setTimeout(() => {
+        toast.update(toastId, {
+            ...  // 변경될 속성들
+        })
+    }, 5000)
