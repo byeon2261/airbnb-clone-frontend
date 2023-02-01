@@ -66,10 +66,10 @@ export default function Header() {
                 </Button>
               </LightMode>
             </>
-          ) : null
-        ) : (
-          <Avatar size={"md"} />
-        )}
+          ) : (
+            <Avatar name={user?.name} src={user?.avatar} size={"md"} />
+          )
+        ) : null}
       </HStack>
       <LoginModal isOpen={isLoginOpen} onClose={onLoginClose} />
       <SignUpModal isOpen={isSignUpOpen} onClose={onSignUpClose} />

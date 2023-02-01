@@ -1046,3 +1046,57 @@ Header에 user로그인이 되었다면 login sign up버튼을 안보이도록 �
         ...
 
 적용 후 python서버에 로그인을 해도 로그인정보를 가져오지 못한다. 해당부분 수정을 진행하도록 하겠다.
+
+### 20.1 Credentials
+
+session authentication은 cookie애 의해 작동된다. 로그인을 하면 Django는 session Object를 database에 생성한다.
+session은 pk와 user데이터를 갖고 있다. Django는 session pk를 cookie에 담아서 보내준다.
+#20.1 Credentials_1 (cookie Session Id).png 참조
+
+# ! 쿠키, 캐시, 세션, 로컬 스로테지
+
+    local storage: local에 저장되는 데이터이다. 계속 저장이 된다. 용량의 제한도 없다.
+
+    cookie: 요청한 데이터를 서버에서 보내주고 local에 저장해둔다. 쿠키는 데이터 요청시 매번 보내진다.
+        수정사항이 있다면 서버에서 변경된 쿠키를 보내준다.
+
+<https://velog.io/@ejchaid/localstorage-sessionstorage-cookie%EC%9D%98-%EC%B0%A8%EC%9D%B4%EC%A0%90>
+
+    cashe: 웹 페이지 요소를 저장한다. 웹페이지를 빨리 렌더링하기 위해 도와준다. 오디오와 비디오 파일을 저장할 수 있다.
+
+    session: 서버에 데이터가 저장된다. cookie는 텍스트형식, session은 object형식으로 저장된다.(db니까..)
+        브라우져 종료시 데이터는 삭제 된다.
+
+<https://hahahoho5915.tistory.com/32>
+
+Django가 쓰는 url과 react가 쓰는 url이 다르기때문에 장고서버에서 react url로 쿠키가 전송되지 않는다. (도메인이 같지 않다.)
+react페이지를 도메인을 갖게 적용을 하면 데이터를 가져올 수 없다. Django에서는 fetch가 가능한 도메인을 적용해야한다.
+
+fetch가능한 도메인을 변경해준다. -backand
+...
+
+Django에 설정을 추가해주면 아직 로그인을 확인하지는 못하지만 cookie에 sessionId 데이터가 추가된다.
+브라우져에 의해 만들어진 요청은 자동으로 Django에 cookie를 보내준다.
+react페이지는 fetch를 하여 데이터를 가져오기 때문에 javascript에 cookie를 포함시키라고 설명을 해야한다.
+
+@src/api.ts
+
+    const instance = axios.create({
+        ... ,
+        withCredentials: true,
+    });
+
+적용 후 송신 에러가 발생한다.
+
+    Access to XMLHttpRequest at 'http://127.0.0.1:8000/api/v2/rooms/'
+    from origin 'http://127.0.0.1:3000' has been blocked by CORS policy:
+    The value of the 'Access-Control-Allow-Credentials' header in the
+    response is '' which must be 'true' when the request's credentials
+    mode is 'include'. The credentials mode of requests initiated by
+    the XMLHttpRequest is controlled by the withCredentials attribute.
+
+Django에서 credential을 받도록 적용해야한다.
+
+...
+
+Django 적용 후 react페이지에서 로그인확인이 가능하다.
