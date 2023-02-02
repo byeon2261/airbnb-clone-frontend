@@ -20,6 +20,7 @@ import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
 import useUser from "../lib/useUser";
 import { logOut } from "../api";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Header() {
   const { userLoading, user, isLoggedIn } = useUser();
@@ -37,6 +38,7 @@ export default function Header() {
   const logoColor = useColorModeValue("red.500", "red.200");
   const Icon = useColorModeValue(FaMoon, FaSun);
   const toast = useToast();
+  const queryClient = useQueryClient();
   const onLogOut = async () => {
     const toastId = toast({
       title: "Login out...",
@@ -44,17 +46,15 @@ export default function Header() {
       status: "loading",
       position: "bottom-right",
     });
-    // const data = await logOut();
-    // console.log(data);
-    setTimeout(() => {
-      toast.update(toastId, {
-        title: "Good bye!!",
-        description: "Log out Completed.",
-        status: "success",
-        isClosable: true,
-        duration: 6000,
-      });
-    }, 5000);
+    await logOut();
+    queryClient.refetchQueries(["me"]);
+    toast.update(toastId, {
+      title: "Good bye!!",
+      description: "Log out Completed.",
+      status: "success",
+      isClosable: true,
+      duration: 6000,
+    });
   };
   return (
     <Stack
@@ -104,7 +104,6 @@ export default function Header() {
           )
         ) : null}
       </HStack>
-
       <LoginModal isOpen={isLoginOpen} onClose={onLoginClose} />
       <SignUpModal isOpen={isSignUpOpen} onClose={onSignUpClose} />
     </Stack>

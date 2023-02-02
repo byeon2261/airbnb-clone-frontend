@@ -1041,9 +1041,10 @@ Header에 user로그인이 되었다면 login sign up버튼을 안보이도록 �
             <>
                 ...
             </>
-        ) : null
-    ) : (
-        ...
+        ) : (
+            ...
+        )
+    ) : null
 
 적용 후 python서버에 로그인을 해도 로그인정보를 가져오지 못한다. 해당부분 수정을 진행하도록 하겠다.
 
@@ -1072,10 +1073,13 @@ session은 pk와 user데이터를 갖고 있다. Django는 session pk를 cookie�
 Django가 쓰는 url과 react가 쓰는 url이 다르기때문에 장고서버에서 react url로 쿠키가 전송되지 않는다. (도메인이 같지 않다.)
 react페이지를 도메인을 갖게 적용을 하면 데이터를 가져올 수 없다. Django에서는 fetch가 가능한 도메인을 적용해야한다.
 
+cookie를 준 도메인과 fetch를 진행하는 도메인이 일치해야한다.
 fetch가능한 도메인을 변경해준다. -backand
 ...
 
+브라우져 url창에 localhost를 대신해서 ip번호를 넣어서 검색을 한다.
 Django에 설정을 추가해주면 아직 로그인을 확인하지는 못하지만 cookie에 sessionId 데이터가 추가된다.
+
 브라우져에 의해 만들어진 요청은 자동으로 Django에 cookie를 보내준다.
 react페이지는 fetch를 하여 데이터를 가져오기 때문에 javascript에 cookie를 포함시키라고 설명을 해야한다.
 
@@ -1142,10 +1146,16 @@ logOut 데이터를 담는 onLogOut()를 생성해준다.
         console.log(data);
     };
 
+로그아웃을 테스트해 본다.
+
 # ! console에 요청 실패 오류메세지
 
     console에 요청 실패 오류메세지가 발생한다고 하는데 본인이 테스트를 진행하면 오류가 발생하지 않음.
-    로그아웃은 되지 않지만 {"ok", "bye"}가 리턴된다.
+    (CSRF Failed 이 발생한다고 한다.)
+
+    오류가 발행하는 원인이 정리된 게시글이다.
+
+<https://han-py.tistory.com/352>
 
 다음 강의에 요청실패하는 원인과 해결을 알려준다고 하니 대기.
 
@@ -1187,3 +1197,102 @@ toast update()를 통해 toast변경이 가능하다. 임의로 딜레이 시간
     HStack대신에 Flex를 사용하여 해결이 가능하다.
 
 <https://github.com/kjh910/airbnb-clone/blob/1a1db114aba436790eab8e166454ca3c8bc3a8f2/airbnb-clone-frontend/app/src/components/organisms/header/header.tsx#L67>
+
+### 20.4 CSRF
+
+Django는 어떠한 사이트에서든 post 요청을 신뢰하지 않으며 공격을 차단한다.
+CSRF는 cross-site request forgery로써 해커가 사용하는 공격의 일종으로 해커의 사이트로부터 post요청을 보내도록 속이는 방법이다.
+credential를 이용하여 정보를 훔치는 목적으로 사용된다.
+
+CSRF 공격이란? 그리고 CSRF 방어 방법
+<https://itstory.tk/entry/CSRF-%EA%B3%B5%EA%B2%A9%EC%9D%B4%EB%9E%80-%EA%B7%B8%EB%A6%AC%EA%B3%A0-CSRF-%EB%B0%A9%EC%96%B4-%EB%B0%A9%EB%B2%95>
+
+Django에 post가능한 url을 추가해준다.
+
+...
+
+Django에 추가를 해주면 기존에 발생하던 오류가 변경된다. post요청을 보낼때 CSRF token을 같이 보내줘야 한다.
+보안 기능이므로 보내주는 것을 구현한다.(cookie에 csrftoken이 있다.) 기능구현을 위해 js-cookie를 설치한다.
+
+<https://www.npmjs.com/package/js-cookie>
+
+    $ npm i js-cookie  // ! 설치 다 안됨.
+
+사용을 위해 import를 하면 타입을 알 수 없기때문에 설치할 때 속성을 추가해달라는 ts오류가 발생한다.
+
+    import Cookie from "js-cookie";
+
+    >>>: Try `npm i --save-dev @types/js-cookie` if it exists or add a new declaration
+    (.d.ts) file containing `declare module 'js-cookie';`
+
+다시 설치해준다.
+
+    $ npm i --save-dev @types/js-cookie
+
+logOut에 token을 담아주도록 적용한다.
+
+    export const logOut = () =>
+        instance
+            .post(`users/log-out`, null, {  // post두번째 자리에는 보내줄 data를 지정한다.
+                // 앱은 CSRF 토큰을 획득하기 위해 헤더에 X-CSRF-Token: fetch를 포함하여야 한다.
+                headers: { "X-CSRFToken": Cookie.get("csfrtoken") },
+            })
+            .then((response) => response.data);
+
+<https://binchoo.tistory.com/46>
+
+이제 로그아웃을 클릭하면 로그아웃 기능이 구현이 된다. Django admin에서도 로그아웃이 된다.
+하지만 로그아웃되면서 refetch기능이 없어서 새로고침을 하지 않으면 페이지가 로그인된 상태로 계속 유지가 된다.
+
+queryClient에는 우리가 fetch한 모든 query와 data가 있다.
+query client를 사용하여 log out시 refetch기능을 구현하도록 하겠다.
+
+@src/components/header
+
+    const queryClient = useQueryClient();
+    const onLogOut = async () => {
+        const toastId = toast({
+            ...
+        });
+        await logOut();
+        // @src/lib/useUser 에 query를 생성할때 쿼리명을 me로 지정하였다.
+        queryClient.refetchQueries(["me"]);  // refetch할 query명을 넣어준다.
+        toast.update(toastId, {
+            ...
+        });
+    };
+
+# ! react 로그인화면 계속 유지
+
+    react페이지는 로그아웃을 진행해도 페이지 변화가 발생하지 않는다. Django 페이지에 가면 로그아웃이 됨.
+    로그아웃 상태에서 !isLoggedIn를 console에 출력하면 false가 나옴.
+    !! 로그인이 안되어있어도 user데이터를 가져오는데 에러가 발생 안한다. 어느 유저로 로그아웃을 했든 gh의 아이디정보가 나온다.
+
+이전에 CSRF Failed 메세지도 발생하지 않고 가져올 user 데이터도 없는데 useUser query에서 에러가 발생하지 않는다. ??
+django와 react 여는 브라우져가 달라서 발생하는 오류 일까.
+
+    브라우져의 탭을 전체 종료 후 다시 실행을 하니 유저 데이터가 나오지 않는다.
+    !!! users/me에 접근할때 브라우져에서 로그인창이 뜬다. 해당 창에서 로그인했던 데이터가 계속 나온거같다.
+    예전에 로그인창이 뜨길래 로그인한적이 있다. gh 아이디로 로그인을 했었다. 해당 정보가 어딘가 남아서 계속 나온듯 싶다.
+    react페이지에서 로그인창이 사라지지 않고 계속 나온다. 해당부분 수정을 진행해야한다.
+
+로그인 창은 #20.4 CSRF_1 (로그인 창) 참조.
+
+Django에서 로그인 후 react페이지에서 log out 테스트 진행.
+
+# ! 이제서야 CSRF오류가 발생
+
+    테스트를 위해 Django의 CSRF_TRUSTED_ORIGINS 설정을 주석처리 했었다.
+    원복진행 후 로그 아웃하니 정상 작동한다. 로그인 창은 계속 뜬다.
+
+# 오류해결 정리
+
+    처음 react페이지를 열었을 때 로그인 창이 떳던 이유는 Django에 settings의 설정때문이였다.
+    인증 클래스에 BasicAuthentication 기능이 추가되어 있어서 로그인창이 떴다. 해당 기능을 지우면 로그인창이 뜨지 않는다.(모든 오류의 원흉)
+
+    CSRF 오류가 발생하지 않았던 이유는 로그인창에서 등록한 유저 정보가 있어서
+    Django에 user정보를 요구를 하지 않아 오류가 발생하지 않았다.
+
+backend 유저 인증 관련 정보는 #15 Authentication 강의를 참조하자.
+
+이제 로그아웃 기능이 정상 작동한다.
