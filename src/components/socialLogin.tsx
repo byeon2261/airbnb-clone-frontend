@@ -17,7 +17,15 @@ export default function SocialLogin() {
         <Divider />
       </HStack>
       <VStack>
-        <Button leftIcon={<FaGithub />} colorScheme={"gray"} w={"100%"}>
+        <Button
+          as={"a"}
+          href={
+            "https://github.com/login/oauth/authorize?client_id=f61c955f466d92d1cac9&scope=read:user,user:email"
+          }
+          leftIcon={<FaGithub />}
+          colorScheme={"gray"}
+          w={"100%"}
+        >
           Continue with Github
         </Button>
         <Button leftIcon={<FaComment />} colorScheme={"yellow"} w={"100%"}>

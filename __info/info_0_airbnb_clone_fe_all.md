@@ -1296,3 +1296,67 @@ Django에서 로그인 후 react페이지에서 log out 테스트 진행.
 backend 유저 인증 관련 정보는 #15 Authentication 강의를 참조하자.
 
 이제 로그아웃 기능이 정상 작동한다.
+
+### 20.5 Github log in
+
+깃허브 로그인 기능을 구현하겠다.
+
+OAuth App
+<https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps>
+
+user가 github 로그인을 클릭하면 github로 이동하며 사용자의 개인정보에 접근을 동의하는지 허락을 구한다.
+user가 허락한다면 github는 유저를 우리가 보내달라고 요청한 url로 토큰과 함께 보내준다.
+
+이 토큰을 Django를 이용해 backend로 보내줘야한다. 그리고 나서 Django는 Github api에 토큰과 함께 요청을 보낸다.
+토큰을 받은 Github api는 유저 정보를 보내준다. 그러면 로그인 프로세스는 마무리된다.
+
+해당 기능을 구현하기 위해서 새로운 app를 생성한다. 하단 url에 이동하여 github app을 생성한다.
+<https://github.com/settings/applications/new>
+
+    Application name: airbnb clone
+    Homepage URL: http://127.0.0.1:3000/api/v2/
+
+    // github가 사용자 정보 제공 동의를 구한다음 redirect시키는 url이다.
+    Authorization callback URL: http://127.0.0.1:3000/api/v2/social/github
+
+app을 생성하면 app정보가 나온며 client id가 있다. <https://github.com/settings/applications/2101837>
+
+social login 모달에 기능구현을 한다.
+
+    <Button
+        as={"a"}  // html 태그로 변환이 가능하다. anker로 변환한다.
+        // anker 속성이 사용가능하다.
+        href={"https://github.com/login/oauth/authorize"}  // 유저를 보내야할 url이다. github OAuth 페이지 설명 참조
+        leftIcon={<FaGithub />}
+        ...
+    >
+        Continue with Github
+    </Button>
+
+github app에 유저를 보낼때 우리의 client_id 파라미터를 같이 보내줘야한다.
+
+    <Button
+        ...
+        href={"...?client_id=f61c955f466d92d1cac9"}
+    >
+
+해당 기능을 구현하면 github login버튼을 클릭하면 github 권한 허가 요청페이지로 이동한다.
+#20.5 Github Log In_1 (github 정보 제공 허가).png 참조.
+앱 이름과 정보를 제공할 유저의 정보가 나온다. 아직 승인을 누르면 안된다.
+
+기본 셋팅은 공개된 정보만 가져올 수 있다.
+사용자가 우리 웹에서 필요한 데이터를 비공개로 해났을 수 있으니 비공개여도 가져와야할 데이터를 정의하겠다.
+
+    <Button
+        ...
+        href={"...?...&scope=read:user,user:email"}  // scope는 사용자에게 얻고 싶은 정보 목록이다.
+    >
+
+<https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps>
+
+적용 후 github login버튼을 클릭하면 사용자에게 요구하는 데이터가 변경된다.
+허용을 클릭하면 github app이 사용자를 기억하며 데이터 요구페이지는 더이상 뜨지 않는다.
+다음 로그인시 바로 Authorization callback URL로 보내준다.
+
+클릭을 하면 Authorization callback URL페이지로 이동이 되며 code파라미터도 같이 보내준다.
+해당 코드가 Django에 보내야 하는 코드이다. 브라우져는 위험하니 backend로 보내는 거다.
