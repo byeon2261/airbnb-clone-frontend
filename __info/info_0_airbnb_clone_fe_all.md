@@ -1360,3 +1360,105 @@ github app에 유저를 보낼때 우리의 client_id 파라미터를 같이 보
 
 클릭을 하면 Authorization callback URL페이지로 이동이 되며 code파라미터도 같이 보내준다.
 해당 코드가 Django에 보내야 하는 코드이다. 브라우져는 위험하니 backend로 보내는 거다.
+
+### 20.6 Github Code
+
+github 로그인을 위한 페이지를 생성한다.
+
+@src/routes/GithubConfirm 생성
+
+    export default function GithubConfirm() {
+        return (
+            <VStack bg={"gray.100"} justifyContent={"center"} minH="100vh">
+                <Heading>Processing log in...</Heading>
+                <Text>Don't go anything.</Text>
+            </VStack>
+        );
+    }
+
+notfound페이지를 가져와서 일부 수정한다.
+
+spinner를 사용하여 로딩중임으로 표현하겠다.
+<https://chakra-ui.com/docs/components/spinner>
+
+    ...
+    <Spinner size="xl" />
+
+컴포넌트를 router에 연결을 해준다.
+
+@src/router
+
+      ...
+      {
+        path: "social",
+        children: [
+          {
+            path: "github",
+            element: <GithubConfirm />,
+          },
+        ],
+      },
+
+kakao로그인도 나중에 추가하므로 children 구성으로 구현한다.
+브라우져에서 해당 url로 이동을 하면 화면이 나온다.
+
+해당 페이지에 도착하게 되면 우리는 github api에서 받은 코드를 backend로 전송한다.
+
+@src/routes/GithubConfirm
+
+    const location = useLocation();  // 우리가 있는 곳을 알려준다.
+    useEffect(() => {
+        console.log(location);
+    });
+
+    >>>: hash: ""
+        key: "default"
+        pathname: "/api/v2/social/github"
+        search: "?code=15ac72cf76f174002643"
+        state: null
+
+location.search 내 parameter가 있다.
+
+url에서 데이터를 가져올 수 있는 URLSearchParams class가 있다.
+
+    const { search } = useLocation();  // location에서 seacrh만 가져온다.
+    const user = new URLSearchParams(search);
+    console.log(user.get("code"));
+
+    >>>: 15ac72cf76f174002643
+
+이제 해당 코드를 전송할 api function을 생성해준다.
+
+@src.api
+
+    export const githubLogin = (code: string) =>
+        instance
+            .post(
+                `users/github`,
+                { code },
+                {
+                    headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
+                }
+            )
+            .then((response) => response.status);
+
+해당 함수를 이용하여 데이터를 전송해준다.
+
+@src/routes/GithubConfirm
+
+    const confirmLogin = async () => {
+        const params = new URLSearchParams(search);
+        const code = params.get("code");
+        if (code) {  // code가 null일 수 있다며 오류가 발생한다. 값이 오는것이 확실하더라도 사용해야한다.
+            await githubLogin(code);
+        }
+    };
+    useEffect(() => {
+        confirmLogin();
+    }, []);
+
+이제 backend에 code를 보내준다. 아직 Django에 users/github페이지가 없기때문에 react페이지 콘솔에서 404 오류가 발생한다.
+
+Django에서 해당 페이지를 생성한다 후 github api와 통신을 한다.
+
+...
