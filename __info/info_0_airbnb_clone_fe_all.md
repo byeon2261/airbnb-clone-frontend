@@ -1462,3 +1462,30 @@ url에서 데이터를 가져올 수 있는 URLSearchParams class가 있다.
 Django에서 해당 페이지를 생성한다 후 github api와 통신을 한다.
 
 ...
+
+### 20.7 Access Token
+
+backend에서 데이터를 github api통신 셋팅
+
+### 20.8 Emails
+
+...
+
+post요청이 두번가면서 두번째에는 bad requests오류가 발생한다.
+react는 develop모드에서 screen을 두번 렌더링한다. 메모리 누수나 버그를 잡기 위해서 그런거다.
+index에 strickmode를 제거해준다.
+
+    <React.StrictMode> -> null
+
+backend에서 로그인을 진행한다 ...
+
+이제 frontend에서 status code와 response를 요청하도록 한다
+
+@src/routes/GithubConfirm
+
+    // status(Num)를 받는다
+    // 로그인이 성공하였다면 toast로 로그인되었다고 알려준다.
+    // 리패치를 진행
+    // 홈으로 이동시킴
+
+유저 로그인 기능이 구현되었다.

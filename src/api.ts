@@ -33,7 +33,7 @@ export const logOut = () =>
     .then((response) => response.data);
 
 export const githubLogin = (code: string) => {
-  instance
+  return instance
     .post(
       `users/github`,
       { code },
