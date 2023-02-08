@@ -7,20 +7,20 @@ import RoomDetail from "./routes/RoomDetail";
 
 const router = createBrowserRouter([
   {
-    path: "/api/v2/",
+    path: "/",
     element: <Root />,
     errorElement: <NotFound />,
     children: [
       {
-        path: "rooms",
+        path: "",
         element: <Home />,
       },
       {
-        path: "rooms/:roomPk",
+        path: "api/v2/rooms/:roomPk",
         element: <RoomDetail />,
       },
       {
-        path: "social",
+        path: "api/v2/social",
         children: [
           {
             path: "github",

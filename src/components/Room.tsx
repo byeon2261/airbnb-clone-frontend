@@ -23,7 +23,7 @@ export default function Room({
 }: IRoomProps) {
   const gray = useColorModeValue("gray.600", "gray.300");
   return (
-    <Link to={`/rooms/${pk}`}>
+    <Link to={`api/v2/rooms/${pk}`}>
       <VStack alignItems={"flex-start"}>
         <Box position={"relative"} overflow={"hidden"} mb={3} rounded={"3xl"}>
           <Image minH="260" src={imgUrl} />

@@ -29,7 +29,7 @@ export default function GithubConfirm() {
           description: "Happy to day",
         });
         queryClient.refetchQueries(["me"]);
-        navigate("/api/v2/rooms");
+        navigate("/");
       }
     }
   };
