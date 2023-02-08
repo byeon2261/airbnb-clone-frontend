@@ -1513,3 +1513,66 @@ redirect URL을 등록한다.
 
     닉네임, 프로필 사진: 필수 사항
     카카오계정(이메일): 선택 사항 (필수 사항은 선택할 수 없다.)
+
+### 20.10 Kakao Talk Auth
+
+카카오 인가 코드(토큰)을 받기 위한 url로 이동을 시켜준다.
+
+<https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#kakaologin>
+
+@src/routes/KakaoConfirm
+
+    export default function KakaoConfirm() {
+        const { search } = useLocation();
+        const confirmLogin = async () => {
+            const params = new URLSearchParams(search);
+            const code = params.get("code");
+            if (code) {
+                await kakaoLogin(code);
+            }
+        };
+        useEffect(() => {
+            confirmLogin();
+        });
+        return ...
+
+@src/api
+
+    export const kakaoLogin = (code: string) =>
+        instance
+            .post(
+                "users/kakao",
+                { code },
+                {
+                    headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
+                }
+            )
+            .then((response) => response.data);
+
+url과 함수, 컴포넌트 명을 제외하고는 github로그인 로직과 일치한다.
+
+소셜 로그인에 파라미터를 정리하여 관리하도록 로직을 변경한다.
+
+    const kakaoParams = {
+        client_id: "f4fdce8bfd733f3368f97c47a87266b6",
+        redirect_uri: "http://127.0.0.1:3000/api/v2/social/kakao",
+        response_type: "code",
+    };
+    const params = new URLSearchParams(kakaoParams).toString();
+    console.log(params);
+
+    >>>: client_id=f4fdce8bfd733f3368f97c47a87266b6&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fapi%2Fv2%2Fsocial%2Fkakao&response_type=code
+
+해당 데이터를 URL에 파라미터를 넣어준다.
+
+    <Button
+        as={"a"}
+        href={`/oauth/authorize?${params}`}
+        ...
+    >
+        Continue with Kakao
+    </Button>
+
+kakao login버튼을 클릭하면 정보 제공 동의 화면으로 이동이 된다.
+
+정보제공을 동의하면 code를 반환해준다. 해당 코드를 이번에도 Django로 보내서 kakao에 유저정보를 요청할 거다.
