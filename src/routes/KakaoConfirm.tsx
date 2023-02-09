@@ -20,24 +20,24 @@ export default function KakaoConfirm() {
     const params = new URLSearchParams(search);
     const code = params.get("code");
     if (code) {
-      console.log(code);
-      return;
-      // const status = await kakaoLogin(code);
-      // if (status == 200) {
-      //   toast({
-      //     status: "success",
-      //     position: "bottom-right",
-      //     title: "Welcome!",
-      //     description: "Happy to day",
-      //   });
-      //   queryClient.refetchQueries(["me"]);
-      //   navigate("/");
-      // }
+      const status = await kakaoLogin(code);
+      if (status == 200) {
+        toast({
+          status: "success",
+          position: "bottom-right",
+          title: "Welcome!",
+          description: "Happy to day",
+          isClosable: true,
+          duration: 6000,
+        });
+        queryClient.refetchQueries(["me"]);
+        navigate("/");
+      }
     }
   };
   useEffect(() => {
     confirmLogin();
-  });
+  }, []);
   return (
     <VStack justifyContent={"center"} mt="40">
       <Heading>Processing log in.</Heading>

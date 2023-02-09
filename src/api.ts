@@ -53,4 +53,4 @@ export const kakaoLogin = (code: string) =>
         headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
       }
     )
-    .then((response) => response.data);
+    .then((response) => response.status);

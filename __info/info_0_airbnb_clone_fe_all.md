@@ -1576,3 +1576,20 @@ url과 함수, 컴포넌트 명을 제외하고는 github로그인 로직과 일
 kakao login버튼을 클릭하면 정보 제공 동의 화면으로 이동이 된다.
 
 정보제공을 동의하면 code를 반환해준다. 해당 코드를 이번에도 Django로 보내서 kakao에 유저정보를 요청할 거다.
+
+### 20.11 Kakao Log In
+
+...backend에서 유저 데이터를 생성 및 로그인 로직을 완성하였다.
+
+# ! kakao로그인 성공시 response code 403발생
+
+    kakao로그인 성공이 되었음에도 유저 로그인 인식이 늦게 이뤄짐.
+    또는 화면을 변경하고 나서 refetch가 되면서 로그인 된걸 인식함.
+    back-end쪽에 print()가 refetch가 될때야 실행이됨. 로그인 시도시 back-end쪽으로 로직이 오지않는 것같음.
+
+    !! api.ts에 instance부분에 return값이 잘못되었음.
+        instance.post(...).then((response) => response.data)
+
+        response.data -> response.status
+
+    return값이 잘못되었다고 post요청이 아예안간것 같이 작동된것은 의아스럽다.
