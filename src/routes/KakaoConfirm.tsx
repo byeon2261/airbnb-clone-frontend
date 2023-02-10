@@ -1,11 +1,4 @@
-import {
-  Heading,
-  Spinner,
-  Text,
-  Toast,
-  useToast,
-  VStack,
-} from "@chakra-ui/react";
+import { Heading, Spinner, Text, useToast, VStack } from "@chakra-ui/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -21,7 +14,7 @@ export default function KakaoConfirm() {
     const code = params.get("code");
     if (code) {
       const status = await kakaoLogin(code);
-      if (status == 200) {
+      if (status === 200) {
         toast({
           status: "success",
           position: "bottom-right",
@@ -37,7 +30,7 @@ export default function KakaoConfirm() {
   };
   useEffect(() => {
     confirmLogin();
-  }, []);
+  });
   return (
     <VStack justifyContent={"center"} mt="40">
       <Heading>Processing log in.</Heading>

@@ -23,9 +23,10 @@ export default function RoomDetail() {
   const { roomPk } = useParams();
   const { isLoading, data } = useQuery<IRoomDetail>([`rooms`, roomPk], getRoom);
   const gray = useColorModeValue("gray.600", "gray.300");
-  const { isLoading: reviewsIsLoading, data: reviewsData } = useQuery<
-    IReview[]
-  >([`rooms`, roomPk, `reviews`], getRoomReviews);
+  const { data: reviewsData } = useQuery<IReview[]>(
+    [`rooms`, roomPk, `reviews`],
+    getRoomReviews
+  );
   return (
     <Box
       mt={10}

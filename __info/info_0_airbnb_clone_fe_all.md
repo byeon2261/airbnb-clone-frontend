@@ -1593,3 +1593,78 @@ kakao login버튼을 클릭하면 정보 제공 동의 화면으로 이동이 �
         response.data -> response.status
 
     return값이 잘못되었다고 post요청이 아예안간것 같이 작동된것은 의아스럽다.
+
+### 20.12 Log In Form
+
+login form은 완성하도록 하겠다. username과 password를 state에 저장 기능을 구현한다.
+
+react hook form을 사용하면 react로 validate하고 form만드는 것을 가능하게 한다.
+
+input의 value와 state의 value를 연결하는 작업을 진행한다.
+
+@components/LoginModal
+
+    const [username, onChangeUsername] = useState("");
+    ...
+    const onChange = (event: React.SyntheticEvent<HTMLInputElement>) => {
+        console.log(event.currentTarget);
+    };
+    ...
+        <Input
+            name="username"  // name 값을 통해 변경되는 주체를 파악한다.
+            onChange={onChange}
+            value={username}
+            ...
+        />
+    ...
+
+    >>>: <input name="username" placeholder="Username" class="chakra-input css-1adv6i9">
+    ! value값이 출력에 나오지는 않지만 존재한다.
+
+값이 입력될 때마다 onChange가 작동된다. 아직 state값이 변경되지 않기때문에 Input창에 입력이 되지 않는다.
+
+Input 입력값을 state에 넣어주도록 한다.
+
+    const onChange = (event: ...) => {
+        const { name, value } = event.currentTarget;
+        if (name === "username") {
+            onChangeUsername(value);
+        } else if (name === "password") {
+            onChangePassword(value);
+        }
+    }
+
+Input 입력값이 state에 저장되면서 Input에 변경값이 나온다.
+
+이제 log in버튼 기능을 작성한다. form으로 username, password, login을 감싼다. modalbody로 감싸져 있으며 기본 속성은 div이며 변경이 가능하다.
+
+    <ModalBody as={"form"}>
+        ...
+            <Input
+                ...
+                type="password"  // 비밀번호 입력처럼 입력값이 별표로 표시된다.
+            >
+        ...
+        <Button
+            type="submit"  // 값이 제출되며 화면이 새로고침 된다.
+        >
+
+화면 새로고침 기능을 삭제하기 위해 함수를 사용하여 기능을 구현한다.
+
+    const onSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
+        event.preventDefault();
+    };
+    ...
+        <ModalBody as={"form"} onSubmit={onSubmit}>
+            ...
+
+ModalBody는 기본 설정이 div이기 때문에 onSubmit을 사용하면 속성 오류때문에 오류가 발생한다.
+두가지 방법이 있는데 onSubmit 제네럴의 타입을 변경하던지,ModalBody가 form이라고 알려줘야한다.
+
+    1. <HTMLFormElement>  ->  <HTMLDivElement>
+    2. onSubmit={onSubmit}  ->  onSubmit={onSubmit as any}
+
+username과 password는 필수 값이기 때문에 required값을 부여한다.
+
+지금까지 username과 password입력을 위한 기능 구현이였다. 나중에 validate도 진행하면서 error를 위한 코드도 작성되어야한다.
+그렇다면 if문을 이용하여 더 길어지는 코드를 작성 및 관리해야한다. react hook form을 이용하여 간단하게 적용해본다.
