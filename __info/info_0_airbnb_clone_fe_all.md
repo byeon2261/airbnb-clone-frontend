@@ -1794,3 +1794,77 @@ required text출력대신 error가 발생한 input을 표시해줄수 있다.
 해당 기능이 안좋은 점이 에러가 난 Input의 테두리는 변경되지만
 해당 Input으로 포거스가 옮겨지면서 focus된 input테두리 색으로 변경된다.
 물론 focus를 옮기면 보이긴한다.
+
+### 20.14 useMutation
+
+API에다 데이터를 보내주는 것을 mutation이라고 한다.
+지금까지는 query를 사용하여 데이터를 가져오는 기능만 구현하였다.
+예를 들어 로그아웃 기능으로는 로그아웃 신호를 받으면 백엔드에 logout기능을 실행시키는 것 밖에 없었다.
+로그인 기능은 검증기능이 필요하기때문에 useMutation기능을 사용하여 로그인 구조를 설계한다.
+
+우선 login api를 생성한다. username과 password를 object로 받는다.
+@api.ts
+
+    export interface IUsernameLoginVariables {
+      username: string;
+      password: string;
+    }
+
+    export const usernameLogin = ({
+      username,
+      password,
+    }: IUsernameLoginVariables) =>
+      instance
+        .post(
+          "users/log-in",
+          { username, password },
+          {
+            headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
+          }
+        )
+        .then((response) => response.data);
+
+Django에서는 data를 ok, error 두가지중 하나를 보내준다.(로그인 성공, 실패)
+두 repsonse의 type도 정의 해준다.
+
+    export interface IUsernameLoginSuccess {
+      ok: string;
+    }
+    export interface IUsernameLoginError {
+      error: string;
+    }
+
+reponse값을 사용할때 해당 타입을 사용하면 된다.
+
+해당 api를 이용하여 mutatiion을 구현한다.
+
+@src/components/LoginModal.tsx
+
+    const mutation = useMutation(usernameLogin, {
+      onMutate: () => {
+        console.log("mutation starting");
+      },
+      onSuccess: (data) => {
+        queryClient.refetchQueries(["me"]);  // refetch를 진행해야 화면에서 로그인이 표시된다.(로그아웃과 같다.)
+        toast({
+          title: "Welcome back!",
+          status: "success",
+        });
+        onClose();  // 로그인이 된다고 모달창이 자동으로 닫히지 않는다. 닫아주자
+      },
+      onError: (error) => {
+        ...  // 다음시간에 error를 구현한다.
+      },
+    });
+    const onSubmit = ({ username, password }: IUser) => {
+      mutation.mutate({ username, password });
+    };
+
+mutate의 isloading을 사용하여 props의 isloading을 구현할 수 있다.
+
+    <Button
+      isLoading={mutation.isLoading}
+      ...
+    >
+
+로딩중에 버튼에서 로딩표시가 생긴다.(시계방향으로 원모양이 뺑글뺑글 회전한다.)
