@@ -1867,4 +1867,16 @@ mutate의 isloading을 사용하여 props의 isloading을 구현할 수 있다.
       ...
     >
 
-로딩중에 버튼에서 로딩표시가 생긴다.(시계방향으로 원모양이 뺑글뺑글 회전한다.)
+로딩중에 버튼에서 로딩표시가 생긴다.(spinner, 시계방향으로 원모양이 뺑글뺑글 회전한다. )
+
+### 20.15 Recap
+
+로그인 오류시 오류 메세지를 나오도록 구현하겠다. useMutation을 사용하여 쉽게 구현이 가능하다.
+
+@src/componenets/LoginModal
+
+    {mutation.error ? (
+      <Text color={"red.500"} textAlign={"center"} fontSize={"sm"}>
+        username or password is wrong
+      </Text>
+    ) : null}

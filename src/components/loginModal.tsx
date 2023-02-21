@@ -101,6 +101,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 {errors.password?.message}
               </Text>
             </InputGroup>
+            {mutation.error ? (
+              <Text color={"red.500"} textAlign={"center"} fontSize={"sm"}>
+                username or password is wrong
+              </Text>
+            ) : null}
             <Button
               isLoading={mutation.isLoading}
               mt={4}
