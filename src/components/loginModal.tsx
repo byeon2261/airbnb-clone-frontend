@@ -35,6 +35,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<IUser>();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -46,12 +47,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       toast({
         title: "Welcome back!",
         status: "success",
+        position: "bottom-right",
+        isClosable: true,
+        duration: 6000,
       });
       onClose();
+      reset();
       queryClient.refetchQueries(["me"]);
-    },
-    onError: (error) => {
-      console.log("mutation has an error");
     },
   });
   const onSubmit = ({ username, password }: IUser) => {

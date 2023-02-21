@@ -1880,3 +1880,61 @@ mutate의 isloading을 사용하여 props의 isloading을 구현할 수 있다.
         username or password is wrong
       </Text>
     ) : null}
+
+로그인 오류 기능을 구현하지만 데이터를 잘못입력해도 로그인 성공 toast가 나온다. (로그인은 안된다)
+백엔드부분에 response데이터 부분을 수정 진행...
+
+backend에서 성공여부에 따라 response에 http프로토콜을 보내주도록 적용했다.
+해당 프로토콜로 로그인 성공여부를 확인을 하니 api부분에서는 response.data를 갖고오지 않아도 된다.
+
+@api.ts
+
+    export const usernameLogin = (...) => instance.post(...);
+
+로그인을 하면 로그인 정보가 모달창 input에 남아 있다. input을 reset하는 기능을 구현한다.
+
+    const {
+      ...,
+      reset,
+    } = useForm<IUser>();
+    ...
+      reset()
+
+만약 값을 변경하고 싶다면 setValue()를 사용하면된다.
+
+    const {
+      ...,
+      setValue,
+    } = useForm<IUser>();
+    ...
+      setValue("username", "I Love You.")  // (변경할 대상, 변경할 값)
+
+로그아웃부분을 mutation기능을 사용하여 로직을 변경해본다.
+
+    const toastId = useRef<ToastId>();  // useRef(): state에 넣지않고 컴포넌트내에서 데이터를 관리할때 사용된다.
+    const mutation = useMutation(logOut, {
+      onMutate: () => {
+        toastId.current = toast({  // ref.current를 사용하여 데이터를 관리한다.(기본값)
+          ...
+        });
+      },
+      onSuccess: () => {
+        if (toastId.current) {  // current type = undefined이므로 if문을 사용하여 값의 확실성을 갖어야 오류가 발생하지 않는다.
+          toast.update(toastId.current, {
+            ...
+          });
+        }
+        queryClient.refetchQueries(["me"]);
+      },
+    });
+    const onLogOut = async () => {
+      mutation.mutate();
+    };
+
+# ! toastId type 오류
+
+onSuccess()부분에 if문을 사용하지 않았을 때 toast.update(`toastId.current` 부분에서 에러발생
+
+    >>>: Type 'undefined' is not assignable to type 'ToastId'.
+
+    해당로직을 if() 안에 넣어주면 오류가 발생하지 않는다.
