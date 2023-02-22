@@ -1938,3 +1938,28 @@ onSuccess()부분에 if문을 사용하지 않았을 때 toast.update(`toastId.c
     >>>: Type 'undefined' is not assignable to type 'ToastId'.
 
     해당로직을 if() 안에 넣어주면 오류가 발생하지 않는다.
+
+### 20.16 Code Challenge
+
+이번 코드 챌린지는 sign up모달창을 구현하는 것이다.
+
+1. sign up api생성 [V]
+2. useForm을 사용하여 입력기능 구현. (register, handleSubmit, formState/error, reset)
+   - 데이터 유효성 검사 추가
+3. toast를 사용하여 성공여부 알려주기. [V]
+   - useForm을 사용하여 예전 방식으로 기능 구현해보기. [V]
+4. mutation을 사용하여 데이터 전달 state관리 기능 구현.
+
+우선 mutation을 사용하지 않고 기능구현을 진행하였다. (Basic)
+
+# ! POST전송하지만, Option 프로토콜로 전송 301 에러
+
+user 생성 post프로토콜을 전송하는데 backend쪽에서는 OPTIONS 프로토콜이 들어오면서 301 상태를 반환한다.
+
+    !! 데이터를 전송하는 backend url이 잘못되었었다.
+
+    "users" -> "users/"
+
+    back-end구조가 config url에서 각 app의 url로 이동이 된다. 이동되면서 "/"를 붙여주면서 path를 이동한다.("users/")
+        (app에서 "/"를 붙여주는것보다 안정성이 높았던 것으로 기억한다.)
+    이전 로직 "users"에서는 path를 제대로 찾지 못한것으로 보인다.

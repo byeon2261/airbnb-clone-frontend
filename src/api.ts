@@ -77,3 +77,21 @@ export const usernameLogin = ({
       headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
     }
   );
+
+export interface ISignUp {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+}
+
+export const signUp = ({ name, email, username, password }: ISignUp) => {
+  console.log(name, email, username, password);
+  instance.post(
+    "users/",
+    { name, email, username, password },
+    {
+      headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
+    }
+  );
+};
