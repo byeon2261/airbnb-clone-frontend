@@ -97,8 +97,7 @@ export const signUp = ({
   language,
   currency,
 }: ISignUp) => {
-  console.log(name, email, username, password);
-  instance.post(
+  return instance.post(
     "users/",
     { name, email, username, password, gender, language, currency },
     {

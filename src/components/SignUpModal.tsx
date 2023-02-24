@@ -47,7 +47,7 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
   const queryClient = useQueryClient();
   const toast = useToast();
   const ToastId = useRef<ToastId>();
-  const mutation = useMutation({
+  const mutation = useMutation(signUp, {
     onMutate: () => {
       ToastId.current = toast({
         title: "Sign upping...",
@@ -71,8 +71,24 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
     },
     onError: () => {},
   });
-  const onSubmit = async (data: IUserSignUp) => {
-    mutation.mutate();
+  const onSubmit = async ({
+    name,
+    email,
+    username,
+    password,
+    gender,
+    language,
+    currency,
+  }: IUserSignUp) => {
+    mutation.mutate({
+      name,
+      email,
+      username,
+      password,
+      gender,
+      language,
+      currency,
+    });
   };
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
