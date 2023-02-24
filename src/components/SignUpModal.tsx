@@ -161,16 +161,16 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
                 User already exists.
               </Text>
             ) : null}
-            <Button
-              isLoading={mutation.isLoading}
-              mt={4}
-              type={"submit"}
-              colorScheme={"red"}
-              w={"100%"}
-            >
-              Sign up
-            </Button>
           </VStack>
+          <Button
+            isLoading={mutation.isLoading}
+            mt={4}
+            type={"submit"}
+            colorScheme={"red"}
+            w={"100%"}
+          >
+            Sign up
+          </Button>
           <SocialLogin />
         </ModalBody>
       </ModalContent>

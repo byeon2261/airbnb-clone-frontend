@@ -108,16 +108,16 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 username or password is wrong
               </Text>
             ) : null}
-            <Button
-              isLoading={mutation.isLoading}
-              mt={4}
-              type="submit"
-              colorScheme={"red"}
-              w={"100%"}
-            >
-              Log In
-            </Button>
           </VStack>
+          <Button
+            isLoading={mutation.isLoading}
+            mt={4}
+            type="submit"
+            colorScheme={"red"}
+            w={"100%"}
+          >
+            Log In
+          </Button>
           <SocialLogin />
         </ModalBody>
       </ModalContent>
