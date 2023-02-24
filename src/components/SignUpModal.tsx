@@ -12,12 +12,15 @@ import {
   ModalOverlay,
   Select,
   Text,
+  ToastId,
   useToast,
   VStack,
 } from "@chakra-ui/react";
 import SocialLogin from "./SocialLogin";
 import { useForm } from "react-hook-form";
 import { signUp } from "../api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 
 interface SignUpModalProps {
   isOpen: boolean;
@@ -41,23 +44,35 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
     register,
     reset,
   } = useForm<IUserSignUp>();
+  const queryClient = useQueryClient();
   const toast = useToast();
+  const ToastId = useRef<ToastId>();
+  const mutation = useMutation({
+    onMutate: () => {
+      ToastId.current = toast({
+        title: "Sign upping...",
+        status: "loading",
+        position: "bottom-right",
+      });
+    },
+    onSuccess: () => {
+      if (ToastId.current) {
+        toast.update(ToastId.current, {
+          title: "Success!",
+          description: "Sign up complete.",
+          status: "success",
+          isClosable: true,
+          duration: 6000,
+        });
+      }
+      queryClient.refetchQueries(["me"]);
+      onClose();
+      reset();
+    },
+    onError: () => {},
+  });
   const onSubmit = async (data: IUserSignUp) => {
-    const toastId = toast({
-      title: "Sign upping...",
-      status: "loading",
-      position: "bottom-right",
-    });
-    await signUp(data);
-    onClose();
-    reset();
-    toast.update(toastId, {
-      title: "Success!",
-      description: "Sign up complete.",
-      status: "success",
-      isClosable: true,
-      duration: 6000,
-    });
+    mutation.mutate();
   };
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -141,7 +156,18 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
               <option value={"krw"}>Won</option>
               <option value={"use"}>Dollar</option>
             </Select>
-            <Button mt={4} type={"submit"} colorScheme={"red"} w={"100%"}>
+            {mutation.error ? (
+              <Text color={"red.500"} fontSize={"sm"}>
+                User already exists.
+              </Text>
+            ) : null}
+            <Button
+              isLoading={mutation.isLoading}
+              mt={4}
+              type={"submit"}
+              colorScheme={"red"}
+              w={"100%"}
+            >
               Sign up
             </Button>
           </VStack>

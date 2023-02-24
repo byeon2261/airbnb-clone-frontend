@@ -1949,6 +1949,8 @@ onSuccess()부분에 if문을 사용하지 않았을 때 toast.update(`toastId.c
 3. toast를 사용하여 성공여부 알려주기. [V]
    - useForm을 사용하여 예전 방식으로 기능 구현해보기. [V]
 4. mutation을 사용하여 데이터 전달 state관리 기능 구현.
+   - useref를 사용하여 데이터 관리
+   - ToastId type 사용하기
 
 우선 mutation을 사용하지 않고 기능구현을 진행하였다. (Basic)
 
