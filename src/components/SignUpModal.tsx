@@ -10,6 +10,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Select,
   Text,
   useToast,
   VStack,
@@ -28,6 +29,9 @@ interface IUserSignUp {
   email: string;
   username: string;
   password: string;
+  gender: string;
+  language: string;
+  currency: string;
 }
 
 export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
@@ -116,6 +120,27 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
                 {errors.password?.message}
               </Text>
             </InputGroup>
+            <Select
+              placeholder="Please select your gender."
+              {...register("gender")}
+            >
+              <option value={"female"}>Female</option>
+              <option value={"male"}>Male</option>
+            </Select>
+            <Select
+              placeholder="Please select your language."
+              {...register("language")}
+            >
+              <option value={"ko"}>Korean</option>
+              <option value={"en"}>English</option>
+            </Select>
+            <Select
+              placeholder="Please select your currency"
+              {...register("currency")}
+            >
+              <option value={"krw"}>Won</option>
+              <option value={"use"}>Dollar</option>
+            </Select>
             <Button mt={4} type={"submit"} colorScheme={"red"} w={"100%"}>
               Sign up
             </Button>

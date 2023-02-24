@@ -83,13 +83,24 @@ export interface ISignUp {
   email: string;
   username: string;
   password: string;
+  gender: string;
+  language: string;
+  currency: string;
 }
 
-export const signUp = ({ name, email, username, password }: ISignUp) => {
+export const signUp = ({
+  name,
+  email,
+  username,
+  password,
+  gender,
+  language,
+  currency,
+}: ISignUp) => {
   console.log(name, email, username, password);
   instance.post(
     "users/",
-    { name, email, username, password },
+    { name, email, username, password, gender, language, currency },
     {
       headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
     }
