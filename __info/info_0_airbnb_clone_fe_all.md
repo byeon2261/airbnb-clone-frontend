@@ -1969,3 +1969,12 @@ user 생성 post프로토콜을 전송하는데 backend쪽에서는 OPTIONS 프�
 데이터를 제대로 전달하는지 확인도 하지않고 완료되었다면 커밋을 진행하였다.
 mutate()를 호출할때 데이터를 넣어주면 된다.
 api에서 return도 확인.
+
+githun, kakao 로그인을 mutation으로 변경하는 작업 진행중.
+
+# ! mutate 반환값이 없음.
+
+이전 기능에서는 api를 호출하면서 async-await함수를 사용하면서 반환값을 기달리고 화면을 전환하는 기능을 구현할 수 있었다.
+하지만 mutation.mutate는 반환값이 없다. 그래서 로그인 정보가 들어오기 전에 화면 전환이 이뤄지면서 user query refech기능도 사용이 안된다.
+
+! mutation.mutateAsync를 사용하면 response값을 받은 다음 로직이 진행이 된다.!!
