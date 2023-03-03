@@ -1978,3 +1978,66 @@ githun, kakao 로그인을 mutation으로 변경하는 작업 진행중.
 하지만 mutation.mutate는 반환값이 없다. 그래서 로그인 정보가 들어오기 전에 화면 전환이 이뤄지면서 user query refech기능도 사용이 안된다.
 
 ! mutation.mutateAsync를 사용하면 response값을 받은 다음 로직이 진행이 된다.!!
+
+### 21.0 Protected Pages
+
+유저가 방을 등록하는 페이지를 생성한다.
+@routes/UploadRoom.tsx 생성, router.tsx에 childer path 추가.
+
+헤더 아바타 아이콘 리스트에 접근할 수 있는 링크 버튼을 생성한다. 해당 버튼은 유저 권한이 is_host가 있을때만 뜬다.
+
+@Components/Header
+
+    <MenuList>
+      {user?.is_host ? (
+        <Link to={"/api/v2/rooms/upload"}>
+          <MenuItem>Upload Room</MenuItem>
+        </Link>
+      ) : null}
+      ...
+    </MenuList>
+
+보안을 사용하여 페이지를 열수있는 권한을 가진 유저만이 페이지에 접근하도록 한다.
+
+1. 로그인된 유저만이 접근 가능한 컴포넌트를 생성한다. @components/ProtectedPage.tsx
+2. 그리고 is_host 권한을 가진 유저만이 접근 가능한 컴포넌트를 생성한다.
+
+useUser.ts 훅을 사용하여 유저 권한을 확인한다.
+
+    export default function ProtectedPage({ children }: IProtectedPageProp) { // children: components안의 element
+      const { userLoading, isLoggedIn } = useUser();  // header에서 데이터를 이미 불러왔기때문에 cashe에서 데이터를 가져온다.
+      const navigate = useNavigate();
+      useEffect(() => {
+        if (!userLoading) {
+          if (!isLoggedIn) {
+            navigate("/");
+          }
+        }
+      }, [userLoading, isLoggedIn, navigate]);  // useEffect listen list
+      return <>{children}</>;
+    }
+
+로그인이 안된상태에서는 홈으로 이동된다.
+
+is_host권한은 user.is_host에서 확인한다.
+
+해당 컴포넌트를 UploadRoom route에 사용한다.
+@routes/UploadRoom.tsx
+
+    <ProtectedPage>
+      <HostOnlyPage>
+        <h1>upload roommmmmm</h1>;
+      </HostOnlyPage>
+    </ProtectedPage>
+
+두 컴포넌트는 훅으로도 생성하여 사용이 가능하다. 훅으로 사용시 매개변수와 리턴값이 없이 사용하면 된다.
+
+@routes/UploadRoom
+
+    ...
+    useHostOnlyPage();
+    return (
+      <ProtectedPage>
+        <h1>...</h1>;
+      </ProtectedPage>
+    );
