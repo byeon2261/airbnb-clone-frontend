@@ -2041,3 +2041,26 @@ is_host권한은 user.is_host에서 확인한다.
         <h1>...</h1>;
       </ProtectedPage>
     );
+
+### 21.1 Upload Form
+
+upload room 페이지를 구현한다. chakra로 구성하며 구성 component예시들을 볼 수 있다.
+
+[Form Control]<https://chakra-ui.com/docs/components/form-control>
+
+@routes/UploadRoom.tsx를 구현한다.
+
+[추가항목]
+
+- Name
+- Country
+- City
+- Address
+- Price
+- Rooms
+- Toilets
+- Descriptions
+- pet_friendly
+- Kind
+
+kind항목은 강의에서는 select를 사용하여 구현했지만 나는 radio기능을 사용하여 구현해봤다.
