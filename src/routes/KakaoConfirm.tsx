@@ -43,7 +43,7 @@ export default function KakaoConfirm() {
   };
   useEffect(() => {
     confirmLogin();
-  }, [3]);
+  }, []);
   return (
     <VStack justifyContent={"center"} mt="40">
       <Heading>Processing log in.</Heading>

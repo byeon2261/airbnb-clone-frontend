@@ -84,9 +84,11 @@ export default function Header() {
       }}
       borderBottomWidth={1}
     >
-      <Box color={logoColor}>
-        <FaAirbnb size={"48"} />
-      </Box>
+      <Link to={"/"}>
+        <Box color={logoColor}>
+          <FaAirbnb size={"48"} />
+        </Box>
+      </Link>
       <HStack spacing={2}>
         <IconButton
           onClick={toggleColorMode}
