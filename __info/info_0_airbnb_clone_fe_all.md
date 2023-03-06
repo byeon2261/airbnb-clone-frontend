@@ -2064,3 +2064,31 @@ upload room 페이지를 구현한다. chakra로 구성하며 구성 component�
 - Kind
 
 kind항목은 강의에서는 select를 사용하여 구현했지만 나는 radio기능을 사용하여 구현해봤다.
+
+### 21.2 Dynamic Form
+
+upload room화면에 category, amenity 목록을 가져와서 선택하여 저장하도록 구현하겠다.
+
+백엔드에 query부분을 수정 작업을 진행한다...
+
+백엔드 작업 후 해당 쿼리를 가져오는 api를 등록한 후 useQuery를 사용하여 데이터를 리스트에 넣어준다.
+
+@src/routes/UploadRoom.tsx
+
+    const { data: amenities, isLoading: isAmenitiesLoading } = useQuery<
+      IAmenity[]
+    >(["amenities"], getAmenities);
+    ...
+      <FormControl>
+        <FormLabel>Amenities</FormLabel>
+        <Grid templateColumns={"1fr 1fr"} gap={5}>
+          {amenities?.map((amenity) => (
+            <Box key={amenity.pk}>
+              <Checkbox>{amenity.name}</Checkbox>
+              <FormHelperText>{amenity.description}</FormHelperText>
+            </Box>
+          ))}
+        </Grid>
+      </FormControl>
+
+저장 버튼을 생성한다.
