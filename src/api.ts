@@ -25,6 +25,12 @@ export const getRoomReviews = ({ queryKey }: QueryFunctionContext) => {
 export const getMe = () =>
   instance.get(`users/me`).then((response) => response.data);
 
+export const getCategoryRooms = () =>
+  instance.get(`categories/rooms/`).then((response) => response.data);
+
+export const getAmenities = () =>
+  instance.get(`rooms/amenities/`).then((response) => response.data);
+
 export const logOut = () =>
   instance
     .post(`users/log-out`, null, {
