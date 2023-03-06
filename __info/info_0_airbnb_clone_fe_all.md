@@ -2092,3 +2092,22 @@ upload room화면에 category, amenity 목록을 가져와서 선택하여 저�
       </FormControl>
 
 저장 버튼을 생성한다.
+
+### 21.3 Register
+
+userForm의 register를 이용하여 데이터를 보내는 기능을 구현하겠다.
+
+@src/routes/UploadRooms.tsx
+{...register }는 입력 및 선택창(Input, Textarea, Checkbox, Radio, Select)에 적용한다.
+(Select의 option에 적용하지 않는다.)
+
+@src/api.ts
+uploadRoom post api도 생성해 준다.
+
+UploadRooms에 useMutation을 사용하여 데이터 전송 상태관리 기능을 구현한다.
+(onSuccess, isLoading, error)
+
+# ! 강의에서는 오류가 발생했는데 내 테스트에서는 저장이 성공되었다.?
+
+암튼 그렇다. 다음 강의에서 해당 오류를 수정하는 과정을 진행할 것이다.
+지금으로써는 backend에 category serializer를 변경한것 외에는 강의와 차이가 없다. (room category만 따로 찾아온는 view를 추가했다.)

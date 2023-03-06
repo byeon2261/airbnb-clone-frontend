@@ -111,3 +111,24 @@ export const signUp = ({
     }
   );
 };
+
+export interface IUploadRoomVariables {
+  name: string;
+  country: string;
+  city: string;
+  price: number;
+  rooms: number;
+  toilets: number;
+  description: string;
+  address: string;
+  pet_friendly: boolean;
+  kind: string;
+  amenities: number[];
+  category: number;
+}
+
+export const uploadRoom = (variable: IUploadRoomVariables) => {
+  return instance.post("rooms/", variable, {
+    headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
+  });
+};
