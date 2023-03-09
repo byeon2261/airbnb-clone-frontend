@@ -12,7 +12,6 @@ import {
   Input,
   InputGroup,
   InputLeftAddon,
-  position,
   Radio,
   RadioGroup,
   Select,
@@ -24,6 +23,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { FaBed, FaDollarSign } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import {
   getAmenities,
   getCategoryRooms,
@@ -32,19 +32,19 @@ import {
 } from "../api";
 import HostOnlyPage from "../components/HostOnlyPage";
 import ProtectedPage from "../components/ProtectedPage";
-import { IAmenity, ICategory } from "../type";
+import { IAmenity, ICategory, IRoomDetail } from "../type";
 
 export default function UploadRoom() {
   const { register, handleSubmit } = useForm<IUploadRoomVariables>();
   const toast = useToast();
-  const { data: categoryRooms, isLoading: isCategoriesLoading } = useQuery<
-    ICategory[]
-  >(["categoryRooms"], getCategoryRooms);
-  const { data: amenities, isLoading: isAmenitiesLoading } = useQuery<
-    IAmenity[]
-  >(["amenities"], getAmenities);
+  const navigate = useNavigate();
+  const { data: categoryRooms } = useQuery<ICategory[]>(
+    ["categoryRooms"],
+    getCategoryRooms
+  );
+  const { data: amenities } = useQuery<IAmenity[]>(["amenities"], getAmenities);
   const mutation = useMutation(uploadRoom, {
-    onSuccess: () => {
+    onSuccess: (data: IRoomDetail) => {
       toast({
         title: "Room Created!",
         position: "bottom-right",
@@ -52,6 +52,7 @@ export default function UploadRoom() {
         isClosable: true,
         duration: 6000,
       });
+      navigate(`/api/v2/rooms/${data.id}`);
     },
   });
   const onSubmit = (data: IUploadRoomVariables) => {
