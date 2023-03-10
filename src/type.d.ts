@@ -5,7 +5,7 @@ export interface IRoomPhoto {
 }
 
 export interface IRoomList {
-  id: number;
+  pk: number;
   name: string;
   country: string;
   city: string;
@@ -51,6 +51,7 @@ export interface IRoomDetail extends IRoomList {
 }
 
 export interface IRoomProps {
+  isOwner: boolean;
   imgUrl: string;
   name: string;
   rating: number;

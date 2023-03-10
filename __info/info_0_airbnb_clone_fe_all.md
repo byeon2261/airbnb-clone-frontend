@@ -2128,12 +2128,12 @@ UploadRooms에 useMutation을 사용하여 데이터 전송 상태관리 기능�
 방 생성시 해당 방detail페이지로 이동되도록 구현한다. 방이 생성될때 backend에서 생성된 방 데이터를 반환한다.
 @src/api.ts>uploadRoom
 
-    반환값에 response.data를 갖고 오도록 적용
+    반환값에 response.data를 갖고 오도록 적용 [L.1825]
 
 @src/routes/UploadRoom.tsx
 
-    - useNavigate()
-    - useMutation()에 매개변수 추가 및 타입 설정
+    - useNavigate() [L.2009]
+    - useMutation()에 매개변수 추가 및 타입 설정 [L.1915]
 
 방 데이터에 사진이 없을 경우 에러가 발생하며 pageNotFound페이지로 이동이 된다.
 사진이 없을 경우 null이 출력되도록 적용을 한다.
@@ -2154,3 +2154,54 @@ UploadRooms에 useMutation을 사용하여 데이터 전송 상태관리 기능�
 backend에서 데이터를 생성할때 pk대신에 컬럼명을 id로 생성하기때문에 type명을 변경한다.
 
     pk -> id
+
+### 21.5 Upload Form
+
+사진을 업로드하기위한 버튼을 생성한다.
+main페이지에서 방 사진이 없을경우 대체 색을 적용하며 is_owner의 방일 경우
+방사진에 하트버튼대신에 카메라버튼을 보여줘서 방사진을 등록하는 페이지로 이동하도록한다.
+
+    - 메인페이지에서 방사진이 없을 경우 초록색 바탕이 보이도록 설정
+        {imgUrl ? ...}
+    - 타입에 isOwner를 추가한다
+    - Owner일 경우 하트버튼 대신에 카메라버튼이 나오도록한다.
+        {isOwner ? ...}
+    - 카메라버튼일 경우 방사진을 등록하는 페이지로 이동하도록 적용
+        - 페이지 생성
+        - router에 등록
+        - 룸사진에 click event 생성
+            const onCameraClick = (event: React.SyntheticEvent<HTMLButtonElement>) => {
+              event.preventDefault();  // 이전의 Link기능이 사용되지 않게 한다.(이 기능이 없을 경우 Link컴포넌트가 실행됨)
+              navigate(`api/v2/rooms/${pk}/photos`);
+            };
+
+upload photo페이지를 구현한다.
+@src/routes/UploadPhotos.tsx
+
+    ...
+    <Input
+      {...register("file")}
+      type={"file"}  // 입력 파일형식을 받는다.
+      accept="image/*"  // image형식만 가능하다.
+    />
+    ...
+
+일반적인 업로드형식을 따르면 이렇다
+
+    유저(클라이언트) --> 서버 --> 스토레이지 서비스
+
+이번에 사용할 서비스는 Cloudflare이다. (유료)
+CloudFlare를 사용할 경우 작동하는 방식은 이렇다.
+
+    1. 유저가 파일을 업로드할 URL을 서버에 요청한다.
+    2. 서버는 CLudFlare에 업로드할 URL을 받는다.
+    3. 유저에게 URL을 건내주면 유저는 해당 URL에 파일을 업로드한다.
+
+우리서버는 파일을 받지 않으며 URL만 건내주며 해당 URL string만 관리한다.
+
+# ! 파일관리에 사용될 다른 방법은 없는가?
+
+타 서비스를 사용하지 않고 데이터베이스에 직접저장하여 관리하는 방법은 어떻게 구현하면 될까?
+니꼬는 파일관리에 다른방법이 없으므로 이 서비스를 신청하여 구현하도록 요청하였다. (니꼬는 DB에 대해서는 잘 모르는거 같다.)
+
+    만약 다른 방법들이 있다면 어떤 방법들이 있을지 업데이트 요청
