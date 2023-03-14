@@ -2181,6 +2181,7 @@ const onCameraClick = (event: React.SyntheticEvent<HTMLButtonElement>) => {
 upload photo페이지를 구현한다.
 @src/routes/UploadPhotos.tsx
 
+```javascript
     ...
     <Input
       {...register("file")}
@@ -2188,6 +2189,7 @@ upload photo페이지를 구현한다.
       accept="image/*"  // image형식만 가능하다.
     />
     ...
+```
 
 일반적인 업로드형식을 따르면 이렇다
 
@@ -2196,9 +2198,9 @@ upload photo페이지를 구현한다.
 이번에 사용할 서비스는 Cloudflare이다. (유료)
 CloudFlare를 사용할 경우 작동하는 방식은 이렇다.
 
-    1. 유저가 파일을 업로드할 URL을 서버에 요청한다.
-    2. 서버는 CLudFlare에 업로드할 URL을 받는다.
-    3. 유저에게 URL을 건내주면 유저는 해당 URL에 파일을 업로드한다.
+1. 유저가 파일을 업로드할 URL을 서버에 요청한다.
+2. 서버는 CLudFlare에 업로드할 URL을 받는다.
+3. 유저에게 URL을 건내주면 유저는 해당 URL에 파일을 업로드한다.
 
 우리서버는 파일을 받지 않으며 URL만 건내주며 해당 URL string만 관리한다.
 
@@ -2207,4 +2209,24 @@ CloudFlare를 사용할 경우 작동하는 방식은 이렇다.
 타 서비스를 사용하지 않고 데이터베이스에 직접저장하여 관리하는 방법은 어떻게 구현하면 될까?
 니꼬는 파일관리에 다른방법이 없으므로 이 서비스를 신청하여 구현하도록 요청하였다. (니꼬는 DB에 대해서는 잘 모르는거 같다.)
 
-    만약 다른 방법들이 있다면 어떤 방법들이 있을지 업데이트 요청
+**만약 다른 방법들이 있다면 어떤 방법들이 있을지 업데이트 요청**
+
+### 21.6 One Time Upload
+
+월 5달러를 결제하면 이미지 업로드 기능을 사용할 수 있다.
+[내 아이디를 이용한 image설정 화면]<https://dash.cloudflare.com/a8932df01716d4d5e2fc3cb9ad442c7d/images>
+해당 기능을 사용하는 것은 다음에 진행하도록 하겠다.
+
+기존에 해오던 로직으로 파일 전송테스트 로직을 작성할 수 있다.
+
+[backend]
+
+- 토큰을 .env에 등록한다.
+- 해당 토큰 및 요청사항을 post로 이용하여 cloudflare URL에 전송한다.
+- 받은 값을 response로 돌려준다.
+
+[frontend]
+
+- api에 backend에 등록한 url로 post요청을 보낸다.
+- 보낼때 file데이터를 useMutation훅으로 보내준다.
+- 받은 값을 console.log로 찍는다.
