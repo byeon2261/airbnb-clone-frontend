@@ -2161,19 +2161,22 @@ backend에서 데이터를 생성할때 pk대신에 컬럼명을 id로 생성하
 main페이지에서 방 사진이 없을경우 대체 색을 적용하며 is_owner의 방일 경우
 방사진에 하트버튼대신에 카메라버튼을 보여줘서 방사진을 등록하는 페이지로 이동하도록한다.
 
-    - 메인페이지에서 방사진이 없을 경우 초록색 바탕이 보이도록 설정
-        {imgUrl ? ...}
-    - 타입에 isOwner를 추가한다
-    - Owner일 경우 하트버튼 대신에 카메라버튼이 나오도록한다.
-        {isOwner ? ...}
-    - 카메라버튼일 경우 방사진을 등록하는 페이지로 이동하도록 적용
-        - 페이지 생성
-        - router에 등록
-        - 룸사진에 click event 생성
-            const onCameraClick = (event: React.SyntheticEvent<HTMLButtonElement>) => {
-              event.preventDefault();  // 이전의 Link기능이 사용되지 않게 한다.(이 기능이 없을 경우 Link컴포넌트가 실행됨)
-              navigate(`api/v2/rooms/${pk}/photos`);
-            };
+- 메인페이지에서 방사진이 없을 경우 초록색 바탕이 보이도록 설정
+  {imgUrl ? ...}
+- 타입에 isOwner를 추가한다
+- Owner일 경우 하트버튼 대신에 카메라버튼이 나오도록한다.
+  {isOwner ? ...}
+- 카메라버튼일 경우 방사진을 등록하는 페이지로 이동하도록 적용
+  - 페이지 생성
+  - router에 등록
+  - 룸사진에 click event 생성
+
+```javascript
+const onCameraClick = (event: React.SyntheticEvent<HTMLButtonElement>) => {
+  event.preventDefault(); // 이전의 Link기능이 사용되지 않게 한다.(이 기능이 없을 경우 Link컴포넌트가 실행됨)
+  navigate(`api/v2/rooms/${pk}/photos`);
+};
+```
 
 upload photo페이지를 구현한다.
 @src/routes/UploadPhotos.tsx
