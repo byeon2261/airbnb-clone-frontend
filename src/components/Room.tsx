@@ -33,7 +33,7 @@ export default function Room({
       <VStack alignItems={"flex-start"}>
         <Box position={"relative"} overflow={"hidden"} mb={3} rounded={"3xl"}>
           {imgUrl ? (
-            <Image minH="260" src={imgUrl} />
+            <Image objectFit={"cover"} minH="260" src={imgUrl} />
           ) : (
             <Box
               minH={"260"}

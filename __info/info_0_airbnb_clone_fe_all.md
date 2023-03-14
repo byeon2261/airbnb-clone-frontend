@@ -2230,3 +2230,21 @@ CloudFlare를 사용할 경우 작동하는 방식은 이렇다.
 - api에 backend에 등록한 url로 post요청을 보낸다.
 - 보낼때 file데이터를 useMutation훅으로 보내준다.
 - 받은 값을 console.log로 찍는다.
+
+### 21.7 File Upload
+
+**cloudflare를 이용한 데이터 업로드 로직**
+frontend
+
+### 21.8 Final Mutation
+
+**cloudflare를 이용한 데이터 업로드 로직**
+frontend, backend
+
+...
+
+### 21.9 Recap
+
+...
+이미지가 찌그러져서 나온다면 Image컴포넌트 속성에
+objectFit={"cover"} 를 사용하면 기존 이미지 비율을 유지해서 나온다.
