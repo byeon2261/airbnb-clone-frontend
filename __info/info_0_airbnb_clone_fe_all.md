@@ -2248,3 +2248,45 @@ frontend, backend
 ...
 이미지가 찌그러져서 나온다면 Image컴포넌트 속성에
 objectFit={"cover"} 를 사용하면 기존 이미지 비율을 유지해서 나온다.
+
+### 22.0 Calendar Component
+
+예약 날짜를 위한 캘린더 기능을 사용한다. 리액트 캘린더 프로그램을 사용하여 기능을 구현한다.
+
+[react-calendar]<https://www.npmjs.com/package/react-calendar>
+
+$ npm i react-calendar
+
+사용을 위해 import를 한다. t.ds파일이 없다며 오류가 발생한다.
+오류 메세지에 설치 명령어를 입력해준다.
+
+$ npm i --save-dev @types/react-calendar
+
+오류가 사라진다. d.ts파일이 설치하면 서버는 서버를 재실행해야 인식이 된다.
+
+calendar에 css파일도 필요하기때문에 임시로 제공해주는 css파일을 import한다.
+
+```javascript
+import "react-calendar/dist/Calendar.css";
+```
+
+캘린더 공간을 위해 Grid를 사용하여 공간을 분리하였다.
+좌측에는 기존에 작업한 owner정보와 리뷰가 있으며 오른쪽에 캘린더를 위치한다.
+
+캘린더 컴포넌트를 사용하여 바로 기능을 사용이 가능하다. 속성을 넣어 일부 기능을 변경하겠다.
+
+```javascript
+<Calendar
+  onChange={setDates}
+  prev2Label={null} // 이전 년단위 이동 버튼을 삭제한다.
+  next2Label={null} // 다음 ''
+  minDetail="month" // 캘린더 선택에 년단위는 제외한다.
+  minDate={new Date()} // 선택가능한 최소날짜 (오늘 날짜)
+  maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 4 * 6 * 1000)} // 최대날짜 (6개월)
+  selectRange // 범위 선택(복수 선택)
+/>
+```
+
+값관리는 useState를 사용한다. state에는 항상 타입을 지정해준다. <Date>를 사용하면 된다.
+해당 데이터 변경을 console.log로 확인한다.
+해당 데이터를 보내주면 서버에서는 예약이 가능한지 알려주는 기능을 구현하기로 한다.
