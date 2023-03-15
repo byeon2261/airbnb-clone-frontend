@@ -14,7 +14,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaRegHeart, FaShareSquare, FaStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { getRoom, getRoomReviews } from "../api";
@@ -30,8 +30,15 @@ export default function RoomDetail() {
     [`rooms`, roomPk, `reviews`],
     getRoomReviews
   );
-  const [dates, setDates] = useState<Date>();
-  console.log(dates);
+  const [dates, setDates] = useState<Date[]>();
+  useEffect(() => {
+    if (dates) {
+      const [firstDate, secondDate] = dates;
+      const [check_in] = firstDate.toJSON().split("T");
+      const [check_out] = secondDate.toJSON().split("T");
+      console.log(check_in, check_out);
+    }
+  }, [dates]);
   return (
     <Box
       mt={10}

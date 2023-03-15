@@ -2290,3 +2290,35 @@ import "react-calendar/dist/Calendar.css";
 값관리는 useState를 사용한다. state에는 항상 타입을 지정해준다. <Date>를 사용하면 된다.
 해당 데이터 변경을 console.log로 확인한다.
 해당 데이터를 보내주면 서버에서는 예약이 가능한지 알려주는 기능을 구현하기로 한다.
+
+### 22.1 Booking Dates
+
+backend에서 예약가능한 날을 check하는 url을 생성한다...
+
+...생성한 backend URL에 날짜데이터를 보내주는 로직을 구현한다.
+
+[console]
+
+```javascript
+const d = new Date()
+d.toJSON()
+>>>: '2023-03-15T08:07:45.806Z'
+d.toJSON().split("T")
+>>>: ['2023-03-15', '08:07:45.806Z']
+```
+
+toJSON().split()를 이용하여 날짜값으로 가져와본다.
+
+```javascript
+...
+const [dates, setDates] = useState<Date[]>();  // 배열타입으로 변경한다.
+useEffect(() => {
+  if (dates) {
+    const [firstDate, secondDate] = dates;
+    const [check_in] = firstDate.toJSON().split("T");  // 첫번째값만 가져온다.
+    const [check_out] = secondDate.toJSON().split("T");
+    console.log(check_in, check_out);
+  }
+}, [dates]);
+...
+```
