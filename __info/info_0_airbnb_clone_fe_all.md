@@ -2322,3 +2322,76 @@ useEffect(() => {
 }, [dates]);
 ...
 ```
+
+### 22.2 Checking Dates
+
+예약날짜를 선택시 예약가능 여부를 알려주는 로직을 작성한다.
+useQuery훅을 사용하여 api호출을 작선한다.
+
+@src/routes/RoomDetail.tsx
+
+```javascript
+const [dates, setDates] = useState<Date[]>();  // Calendar 컴포넌트 prop에서 변경. onChange={setDates}
+const { data: checkBookingData, isLoading: isCheckingBooking } = useQuery(
+    ["check", roomPk, dates],
+    checkBooking,
+);
+```
+
+받아오는 dates값은
+
+    Tue Mar 28 2023 17:56:44 GMT+0900 (한국 표준시)
+
+이런 형식이다. dates.toJSON()는
+
+    '2023-03-28T08:56:44.968Z'
+
+으로 split으로 앞에 날짜값만 가져올수 있다.
+
+    dates.toJSON().split("T")
+    >>>: '2023-03-28'
+
+위 방식을 사용하여 날짜값을 변수에 넣어준다. checkBooking api를 추가해준다.
+
+@src/api.ts
+
+```javascript
+type checkBookingQueryKey = [string, string?, Date[]?];  // dates 타입을 지정해줘야 type오류가 발생하지 않는다.
+
+export const checkBooking = ({
+    queryKey,
+}: QueryFunctionContext<checkBookingQueryKey>) => {
+    const [_, roomPk, dates] = queryKey;
+    if (dates) {
+        const [firstDate, secondDate] = dates;  // 이부분이 타입이 없다면 오류가 발생.
+        const [checkIn] = firstDate.toJSON().split("T");
+        const [checkOut] = secondDate.toJSON().split("T");
+        return instance
+        .get(
+            `rooms/${roomPk}/bookings/check?check_in=${checkIn}&check_out=${checkOut}`
+        )
+        .then((response) => response.data);
+    }
+};
+```
+
+가능여부에 따라 backend에서 Boolean값을 반환한다.
+
+가능여부에 따라 화면에서 예약버튼 클릭가능여부 및 불가능 안내문구를 추가해준다.
+
+```javascript
+<Button
+  disabled={!checkBookingData?.ok} // false일 경우 클릭 불가능
+  isLoading={isCheckingBooking}
+  my={5}
+  w={"91%"} // 캘릭더 크기에 맞춤
+  colorScheme={"red"}
+>
+  Make booking
+</Button>;
+{
+  !isCheckingBooking && !checkBookingData?.ok ? ( // false일 경우
+    <Text color={"red.500"}>Can't book on those dates, sorry.</Text>
+  ) : null;
+}
+```

@@ -14,10 +14,10 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaRegHeart, FaShareSquare, FaStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { getRoom, getRoomReviews } from "../api";
+import { checkBooking, getRoom, getRoomReviews } from "../api";
 import { IReview, IRoomDetail } from "../type";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -31,14 +31,14 @@ export default function RoomDetail() {
     getRoomReviews
   );
   const [dates, setDates] = useState<Date[]>();
-  useEffect(() => {
-    if (dates) {
-      const [firstDate, secondDate] = dates;
-      const [check_in] = firstDate.toJSON().split("T");
-      const [check_out] = secondDate.toJSON().split("T");
-      console.log(check_in, check_out);
+  const { data: checkBookingData, isLoading: isCheckingBooking } = useQuery(
+    ["check", roomPk, dates],
+    checkBooking,
+    {
+      enabled: dates !== undefined,
     }
-  }, [dates]);
+  );
+  console.log(checkBookingData);
   return (
     <Box
       mt={10}
@@ -104,7 +104,7 @@ export default function RoomDetail() {
           </GridItem>
         ))}
       </Grid>
-      <Grid gap={20} templateColumns={"1fr 1fr"} maxW="container.2xl">
+      <Grid gap={60} templateColumns={"2fr 1fr"}>
         <Box>
           <HStack justifyContent={"space-between"} mt={10}>
             <VStack alignItems={"flex-start"}>
@@ -171,7 +171,6 @@ export default function RoomDetail() {
         </Box>
         <Box pt={10}>
           <Calendar
-            showDoubleView
             onChange={setDates}
             prev2Label={null}
             next2Label={null}
@@ -180,6 +179,18 @@ export default function RoomDetail() {
             maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 4 * 6 * 1000)}
             selectRange
           />
+          <Button
+            disabled={!checkBookingData?.ok}
+            isLoading={isCheckingBooking}
+            my={5}
+            w={"91%"}
+            colorScheme={"red"}
+          >
+            Make booking
+          </Button>
+          {!isCheckingBooking && !checkBookingData?.ok ? (
+            <Text color={"red.500"}>Can't book on those dates, sorry.</Text>
+          ) : null}
         </Box>
       </Grid>
     </Box>
