@@ -17,8 +17,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaRegHeart, FaShareSquare, FaStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { checkBooking, getRoom, getRoomReviews } from "../api";
 import { IReview, IRoomDetail } from "../type";
+import "../calendar.css";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
@@ -47,6 +49,9 @@ export default function RoomDetail() {
         lg: 40,
       }}
     >
+      <Helmet>
+        <title>{data ? data.name : "Loading..."}</title>
+      </Helmet>
       <Skeleton h={"43px"} w={"50%"} isLoaded={!isLoading}>
         <Heading>{data?.name}</Heading>
       </Skeleton>
@@ -171,6 +176,7 @@ export default function RoomDetail() {
         </Box>
         <Box pt={10}>
           <Calendar
+            goToRangeStartOnSelect
             onChange={setDates}
             prev2Label={null}
             next2Label={null}
@@ -181,7 +187,7 @@ export default function RoomDetail() {
           />
           <Button
             disabled={!checkBookingData?.ok}
-            isLoading={isCheckingBooking}
+            isLoading={isCheckingBooking && dates !== undefined}
             my={5}
             w={"91%"}
             colorScheme={"red"}

@@ -2395,3 +2395,70 @@ export const checkBooking = ({
   ) : null;
 }
 ```
+
+### 22.3 Timezones
+
+캘린더에 날짜데이터를 가져올때 json형식으로 데이터를 가져올때 데이터의 변형이 이뤄진다.
+
+    받아오는 dates값은
+        >>>: Tue Mar 28 2023 17:56:44 GMT+0900 (한국 표준시)
+
+    이런 형식이다. dates.toJSON()는
+        >>>: '2023-03-28T08:56:44.968Z'
+
+이미 예약되어있는 데이터를 가져올 때 DB에서는 한국 표준시로 가져오지만 예약날짜를 체크할때는 한국 표준시로 가져오지 않으면서 버그가 발생한다.
+예를 들어 10일까지 예약이 되어 있고 11일에 예약을 할려고 하면 예약이 이미 있다고 체크가 된다.
+그러므로 toJSON()으로 가져오는 방식을 변경하기로 한다.
+
+```javascript
+`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDay()}`;
+```
+
+일일히 가져와서 데이터형식에 맞춰 넣어준다. getMonth()는 1월이 0부터 시작하므로 +1을 해준다.
+해당 형식을 utils파일을 생성하여 옮겨준다.
+
+@src/lib/utils.ts
+
+```javascript
+export const formatDate = (date: Date) =>
+  `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDay()}`;
+```
+
+@.../api.ts 에서 해당 함수에 데이터를 보내줘서 값을 받는다.
+
+캘린더의 css를 수정하여 적용하기로 한다. css파일을 생성한다. 강의 링크에서 파일을 가져와서 적용했다.
+@src/calendar.css 생성 후 RoomDetail.tsx에 import.
+
+웹페이지가 변경될때 title을 변경하고자 한다면 react-Helmet을 사용하여 기능구현을 한다.
+
+    $ npm i react-Helmet
+    $ npm i --save-dev @types/react-helmet
+
+구현할 페이지에 아무곳에 helmet컴포넌트를 넣어서 사용하면 된다.
+
+```javascript
+<Helmet>
+  <title>{data ? data.name : `Loading...`}</title>
+</Helmet>
+```
+
+이전 booking버튼에 날짜를 선택하지 않았는데 loading표시가 생기는 현상을 수정한다. 날짜 데이터가 들어왔을때 loading기능이 실행되도록 적용한다.
+
+@.../RoomDetail.tsx
+
+```javascript
+<Button
+    isLoading={... && dates !== undefined}
+>
+```
+
+Calendar에서 showDoubleView 속성을 사용하게 될경우 next month의 날짜를 선택하면 현재달로 인식하면서 선택한 달이 왼쪽으로 이동하는 현상이 있었다.
+그 현상을 억제하는 props가 있다.
+
+```javascript
+<Calendar
+    goToRangeStartOnSelect
+>
+```
+
+테스트 필요.. 아직 미확인
