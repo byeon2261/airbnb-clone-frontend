@@ -284,6 +284,8 @@ button을 react-router-dom의 Link로 덮어준다.
 
 버튼 클릭시 홈으로 이동한다.
 
+## 18. Chakra ui
+
 [2_Chakra]
 
 root에 header를 생성한다.
@@ -368,35 +370,35 @@ useDisclosure() 에서 'isOpen' boolean과 close, open 함수를 제공해준다
 modal을 구성해본다.
 
 ```tsx
-	...
-		<Button onClick={onOpen}>Log in</Button>
-	...
-	<Modal onClose={onClose} isOpen={isOpen}>
-			<ModalOverlay />  # 페이지를 어둡게해서 model을 더 집중적으로 만들어준다.
-			<ModalContent>
-					<ModalHeader>Log In</ModalHeader>
-					<ModalBody>
-							<Input variant={"filled"} placeholder={"Username"} />
-							<Input variant={"filled"} placeholder={"Password"} />
-							<Button colorScheme={"red"} w={"100%"}>  # w == wight. 길이를 모달창에 맞춘다.
-									Log In
-							</Button>
-					</ModalBody>
-			</ModalContent>
-	</Modal>
+...
+	<Button onClick={onOpen}>Log in</Button>
+...
+<Modal onClose={onClose} isOpen={isOpen}>
+	<ModalOverlay />  // 페이지를 어둡게해서 model을 더 집중적으로 만들어준다.
+	<ModalContent>
+		<ModalHeader>Log In</ModalHeader>
+		<ModalBody>
+			<Input variant={"filled"} placeholder={"Username"} />
+			<Input variant={"filled"} placeholder={"Password"} />
+			<Button colorScheme={"red"} w={"100%"}>  // w == wight. 길이를 모달창에 맞춘다.
+					Log In
+			</Button>
+		</ModalBody>
+	</ModalContent>
+</Modal>
 ```
 
 modal이 생성되고 사라질때 애니메이션도 있다.
 input들과 Button이 간격이 없다. stack태그로 감싸준다. input창에 이모티콘도 추가해준다.
 
 ```tsx
-	<VStack>
-			<InputGroup>  # Input창안에 여러가지 요소를 넣을경우 사용한다. 요소간에 간격을 만들어 준다
-					<InputLeftElement ... children={<FaUserEdit />} />  # 이모티콘을 왼쪽에 추가해준다
-					<Input ... placeholder={"Username"} />
-			</InputGroup>
-			...
-	</VStack>
+<VStack>
+	<InputGroup>  # Input창안에 여러가지 요소를 넣을경우 사용한다. 요소간에 간격을 만들어 준다
+		<InputLeftElement ... children={<FaUserEdit />} />  # 이모티콘을 왼쪽에 추가해준다
+		<Input ... placeholder={"Username"} />
+	</InputGroup>
+	...
+</VStack>
 ```
 
 sns 로그인 버튼을 구현한다. 구현 전 컴포넌트를 각 기능으로 분리하는 방식으로 리팩토링해보도록 하겠다.
@@ -405,18 +407,20 @@ header, log in, sns log in 등 각각 분리한다.
 
 ```tsx
 <HStack my={8}>  // 기존 로그인 컴포넌트와 sns로그인 버튼 간격을 둔다.
-		<Divider />  // 가로로 절취선같이 선이 나눠진다. #18.2 Sign Up Modal_1 이미지 참조
-		<Text
-				textTransform={"uppercase"}  // 대문자 변환
-				fontSize={"xs"}
-				as={"b"}  // bold체
-		>
-		...
-		<Divider />  // 세로로 나누는 태그도 있다.
+	<Divider />  // 가로로 절취선같이 선이 나눠진다. #18.2 Sign Up Modal_1 이미지 참조
+	<Text
+		textTransform={"uppercase"}  // 대문자 변환
+		fontSize={"xs"}
+		as={"b"}  // bold체
+	>
+	...
+	<Divider />  // 세로로 나누는 태그도 있다.
 ...
-		<Button leftIcon={<FaGithub />} ...>  // 버튼에서는 ...Icon 속성을 사용하여 이미지를 넣을 수 있다
-		...
+	<Button leftIcon={<FaGithub />} ...>  // 버튼에서는 ...Icon 속성을 사용하여 이미지를 넣을 수 있다
+	...
 ```
+
+![#18.2 Sign Up Modal_1](https://raw.githubusercontent.com/byeon2261/airbnb-clone-frontend/main/__img/%2318.2%20Sign%20Up%20Modal_1.png)
 
 설정 적용확인 후 절취선과 sns 로그인 버튼은 컴포넌트 분리를 한다. 해당 태그를 Box태그로 감싸서 새 컴포넌트에 옮겨준다.
 @scr/components/socialLogin.tsx 생성
@@ -432,9 +436,9 @@ export default function SocialLogin() {
 root코드의 기존에 있던 코드가 비워진 곳에 새로 생성한 컴포넌트 태그를 사용한다.
 
 ```tsx
-	...
-	<SocialLogin />
-	...
+...
+<SocialLogin />
+...
 ```
 
 옮기기 전과 똑같이 동작하는 것을 확인한다.
@@ -574,30 +578,30 @@ useColorMode() 에 colorMode는 이제 필요 없기때문에 삭제해준다.
 room을 보여줄 그리드를 구성한다.
 
 ```tsx
-# columnGap: x축 간격. rowGap: y축 간격. templateColumns: column을 격자로 생성해준다. (5, 1fr): 5컬럼을 최대크기로 배치
+// columnGap: x축 간격. rowGap: y축 간격. templateColumns: column을 격자로 생성해준다. (5, 1fr): 5컬럼을 최대크기로 배치
 <Grid ... columnGap={4} rowGap={8} templateColumns={"repeat(5, 1fr)"}>
-		<VStack alignItems={"flex-start"}>  # 기본 중간정렬이다. flex-start로 앞으로 정렬
-				# hidden값을 부여해야 rounded값이 box안에 이미지에 적용된다.. rounded: border-radios기능
-				<Box overflow={"hidden"} ... rounded={"3xl"}>
-				...
-						<Grid gap={2} templateColumns={"6fr 1fr"}>  # 6:1 비율로 컬럼을 배치한다.
-								<Text display={"block"}  noOfLines={1} ...>  # block why??. 텍스트가 일정이상 줄이 넘어가면 생략한다
-						...
+	<VStack alignItems={"flex-start"}>  // 기본 중간정렬이다. flex-start로 앞으로 정렬
+		// hidden값을 부여해야 rounded값이 box안에 이미지에 적용된다.. rounded: border-radios기능
+		<Box overflow={"hidden"} ... rounded={"3xl"}>
+		...
+			<Grid gap={2} templateColumns={"6fr 1fr"}>  // 6:1 비율로 컬럼을 배치한다.
+				<Text display={"block"}  noOfLines={1} ...>  // block why??. 텍스트가 일정이상 줄이 넘어가면 생략한다
+			...
 ```
 
 room 이미지 위에 하트 버튼을 생성한다.
 
 ```tsx
 <Box position={"relative"} ...>
-		<Button
-				variant={"unstyled"}
-				position="absolute"
-				top={2}  # 상단 우측
-				right={0}
-				color="white"
-		>
-				<FaRegHeart size="20px" />
-		</Button>
+	<Button
+		variant={"unstyled"}
+		position="absolute"
+		top={2}  # 상단 우측
+		right={0}
+		color="white"
+	>
+		<FaRegHeart size="20px" />
+	</Button>
 ...
 ```
 
@@ -606,11 +610,11 @@ room 이미지 위에 하트 버튼을 생성한다.
 
 ```tsx
 <Grid ... >
-		{[
-				1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 3, 4, 5, 3, 4, 3, 4, 3, 4, 3, 3, 4, 3, 4, ...
-		].map((index) => (
-				<VStack ...> ...  # 기존에 생성한 room
-		))}
+	{[
+		1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 3, 4, 5, 3, 4, 3, 4, 3, 4, 3, 3, 4, 3, 4, ...
+	].map((index) => (
+		<VStack ...> ...  # 기존에 생성한 room
+	))}
 </Grid>
 ```
 
@@ -619,15 +623,15 @@ room객체가 여러개가 생성이된다.
 
 ```tsx
 <Grid
-		...
-		templateColumns={{
-				base: "1fr",  // base: 차크라 자체가 안드로이드를 위해 만들어졌기 때문에 base는 안드로이드 화면 크기이다.
-				sm: "1fr",
-				md: "1fr 1fr",
-				lg: "repeat(3, 1fr)",  //  === "1fr 1fr 1fr"
-				xl: "repeat(4, 1fr)",
-				"2xl": "repeat(5, 1fr)",  // 일반 pc 풀화면 크기. 숫자가 들어갈경우에는 ""으로 묶어줘서 str으로 보내준다.
-		}}
+	...
+	templateColumns={{
+		base: "1fr",  // base: 차크라 자체가 안드로이드를 위해 만들어졌기 때문에 base는 안드로이드 화면 크기이다.
+		sm: "1fr",
+		md: "1fr 1fr",
+		lg: "repeat(3, 1fr)",  //  === "1fr 1fr 1fr"
+		xl: "repeat(4, 1fr)",
+		"2xl": "repeat(5, 1fr)",  // 일반 pc 풀화면 크기. 숫자가 들어갈경우에는 ""으로 묶어줘서 str으로 보내준다.
+	}}
 >
 ```
 
@@ -637,16 +641,16 @@ room객체가 여러개가 생성이된다.
 
 ```tsx
 <Stack  // direction을 변경하기 위해서 VStack에서 Stack으로 변경한다. Stack은 기본 가로모드이다.
-		alignItems="center"
-		direction={{
-				sm: "column",  // 세로로 배열
-				md: "row",  // 가로
-		}}
-		spacing={{
-				sm: 4,  // 세로로 배열시 간격을 두기 위함
-				lg: 0,
-		}}
-		...
+	alignItems="center"
+	direction={{
+		sm: "column",  // 세로로 배열
+		md: "row",  // 가로
+	}}
+	spacing={{
+		sm: 4,  // 세로로 배열시 간격을 두기 위함
+		lg: 0,
+	}}
+	...
 >
 ```
 
@@ -685,155 +689,188 @@ room객체에 별점에 마우스를 올려놓으면 색깔이 변경되는 기�
 
 #### [1_React]
 
-    room url을 fetch한다.
-    - src/routes/home -
-        import { useEffect } from "react";
+room url을 fetch한다.
 
-        useEffect(() => {
-            fetch("http://127.0.0.1:8000/api/v2/rooms/");  # url 끝에 /를 붙여줘야한다.
-        }, []);
-    react 프로젝트를 실행하면 검사창에서 CORS에러가 발생한다. 서버가 사용자에게 서버로부터 무언가를 fetch하는 것을 허용하지 않는다는 것이다.
+@src/routes/home.tsx
+
+```tsx
+import { useEffect } from "react";
+
+useEffect(() => {
+	fetch("http://127.0.0.1:8000/api/v2/rooms/");  # url 끝에 /를 붙여줘야한다.
+}, []);
+```
+
+react 프로젝트를 실행하면 검사창에서 CORS에러가 발생한다. 서버가 사용자에게 서버로부터 무언가를 fetch하는 것을 허용하지 않는다는 것이다.
 
 #### backend.[2_Django]
 
-    backend셋팅을 한다. aribnb-clone-backend/info/info_0_airbnb_clone_all.md 참조
-    ...
-    백엔드 셋팅이 완료되면 console창에 CORS에러가 발생하지 않는다. 네트워크에서도 fetch에러가 발생하지 않아야한다.
-    # #19.0 Manual Fetching_1 참조
+backend셋팅을 한다. aribnb-clone-backend/info/info_0_airbnb_clone_all.md 참조
+...
+백엔드 셋팅이 완료되면 console창에 CORS에러가 발생하지 않는다. 네트워크에서도 fetch에러가 발생하지 않아야한다.
 
-    앞서 만든 fetch를 State에 넣는다. 로딩중인 state와 room데이터를 보여줄 state를 생성해야한다.
-        const [isLoading, setIsLoading] = useState(true);
-        const [rooms, setRooms] = useState();  # (): undefined
-        const fetchRooms = async () => {
-            const response = await fetch("http://127.0.0.1:8000/api/v2/rooms/");
-            const json = await response.json();
-            setRooms(json);
-            setIsLoading(false);
-        };
-        useEffect(() => {
-            fetchRooms();
-        }, []);
-        return (
-            <Grid ...>
-                {isLoading ? (
-                    <>
-                        <RoomSkeleton />
-                        <RoomSkeleton />
-                        <RoomSkeleton />
-                        ...
-                    </>
-                ) : null}
-            </Grid>
-        )
-    이건 예전의 fetch방식이다.
-    이렇게 하나의 컴포넌트로 데이터를 fetch할 수 있지만 애플리케이션의 규모가 커지면 다른방법이 필요하다.
-    그 방법은 다음에 변경하고 room데이터를 가져오겠다.
-        {rooms.map((room) => (
-            <Room />
-        ))}
-    화면변경없이 잘 나온다
+#19.0 Manual Fetching_1 참조.
 
-    이젠 실제 데이터를 표현하도록 하겠다.
-    이제 prop로 실제 데이터를 가져온다.
-    - components/room -
-        interface RoomProps {
-            imgUrl: string;
-            name: string;
-            rating: number;
-            ...
-        }
-        export default function Room({
-            imgUrl,
-            name,
-            rating,
-            ...
-        }: RoomProps) {
-            ...
-            <Image src={imgUrl} ... />  # {}: 변수값
-            ...
-    데이터를 다 변경한다.
-    home state에서 데이터를 보내준다.
-        interface IPhoto {  # photos array 정의
-            pk: number;
-            file: string;
-            description: string;
-        }
+![#19.0 Manual Fetching_1](https://raw.githubusercontent.com/byeon2261/airbnb-clone-frontend/main/__img/%2319.0%20Manual%20Fetching_1.png)
 
-        interface IRoom {
-            pk: number;
-            name: string;
-            ...
-            photos: IPhoto[];  # Photo interface
-        }
-        ...
-            const [rooms, setRooms] = useState<IRoom[]>([]);
-            ...
-                {rooms.map((room) => (
-                    <Room
-                        imgUrl={rooms.photos[0]}
-                        name={room.name}
-                        rating={room.rating}
-                        ...
-                    />
-                ))}
+앞서 만든 fetch를 State에 넣는다. 로딩중인 state와 room데이터를 보여줄 state를 생성해야한다.
+
+```tsx
+const [isLoading, setIsLoading] = useState(true);
+const [rooms, setRooms] = useState();  # (): undefined
+const fetchRooms = async () => {
+	const response = await fetch("http://127.0.0.1:8000/api/v2/rooms/");
+	const json = await response.json();
+	setRooms(json);
+	setIsLoading(false);
+};
+useEffect(() => {
+	fetchRooms();
+}, []);
+return (
+	<Grid ...>
+		{isLoading ? (
+			<>
+				<RoomSkeleton />
+				<RoomSkeleton />
+				<RoomSkeleton />
+				...
+			</>
+		) : null}
+	</Grid>
+)
+```
+
+이건 예전의 fetch방식이다.
+이렇게 하나의 컴포넌트로 데이터를 fetch할 수 있지만 애플리케이션의 규모가 커지면 다른방법이 필요하다.
+그 방법은 다음에 변경하고 room데이터를 가져오겠다.
+
+```ts
+{
+  rooms.map((room) => <Room />);
+}
+```
+
+화면변경없이 잘 나온다
+
+이젠 실제 데이터를 표현하도록 하겠다.
+이제 prop로 실제 데이터를 가져온다.
+
+@components/Room.tsx
+
+```tsx
+interface RoomProps {
+	imgUrl: string;
+	name: string;
+	rating: number;
+	...
+}
+
+export default function Room({
+	imgUrl,
+	name,
+	rating,
+	...
+}: RoomProps) {
+	...
+	<Image src={imgUrl} ... />  // {}: 변수값
+	...
+```
+
+데이터를 다 변경한다.
+home state에서 데이터를 보내준다.
+
+```tsx
+interface IPhoto {  // photos array 정의
+	pk: number;
+	file: string;
+	description: string;
+}
+
+interface IRoom {
+	pk: number;
+	name: string;
+	...
+	photos: IPhoto[];  // Photo interface
+}
+...
+	const [rooms, setRooms] = useState<IRoom[]>([]);
+	...
+		{rooms.map((room) => (
+			<Room
+				imgUrl={rooms.photos[0]}
+				name={room.name}
+				rating={room.rating}
+				...
+			/>
+		))}
+```
 
 ### 19.2 React Query
 
 #### [1_React]
 
 예전에 react query라고 불렸던 tenstack query를 설치하여 사용한다. (이름을 변경)
-
 <https://tanstack.com/query/latest/docs/react/installation>
 
     $ npm i @tanstack/react-query
 
 tanstack의 QueryClientProvider로 기존 앱을 감싸준다.
+
 @src/index.tsx
 
-    import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+```tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-    const client = new QueryClient();
-        ...
-        root.render(
-            <React.StrictMode>
-                <QueryClientProvider client={client}> # 앱을 감싸준다.
-                    ...
-                <QueryClientProvider>
-            ...
+const client = new QueryClient();
+	...
+	root.render(
+		<React.StrictMode>
+			<QueryClientProvider client={client}> // 앱을 감싸준다.
+				...
+			<QueryClientProvider>
+		...
+```
 
 react query를 사용하면 캐싱을 저장하여 다시 화면으로 돌아올때 다시 fetch를 하며 로딩이 하지않고 바로 화면을 보여준다.
 api.ts를 생성하여 api를 패치하기 위한 함수를 다 옮겨준다.
 @src/api.ts
 
-    const BASE_URL = "http://127.0.0.1:8000/api/v2/";
+```tsx
+	const BASE_URL = "http://127.0.0.1:8000/api/v2/";
 
-    export async function getRooms() {  # async: 로딩중인지 확인하기위해 싱크
-        const response = await fetch(`${BASE_URL}rooms/`);
-        const json = await response.json();
-        return json;
-    }
+	export async function getRooms() {  # async: 로딩중인지 확인하기위해 싱크
+		const response = await fetch(`${BASE_URL}rooms/`);
+		const json = await response.json();
+		return json;
+	}
+```
 
 src/routes/home의 소스를 옮겨준다.
 home에 State소스와 useEffect 소스를 삭제하고 useQuery훅을 사용한다.
 
-    import { useQuery } from "@tanstack/react-query";
-    import { getRooms } from "../api";
+```tsx
+import { useQuery } from "@tanstack/react-query";
+import { getRooms } from "../api";
 
-    export default function Home() {
-        # isLoading: 로딩중일 경우 true를 받음. data:json데이터. ["rooms"]: 데이터를 찾는 키, 해당 키로 값을 찾아올 수 있음.
-        const { isLoading, data } = useQuery(["rooms"], getRooms);  # rooms이름 아래로 데이터들이 저장된다.
-        ...
-        {data.map((room) => (  # rooms -> data
-            ...
-        ))}
+export default function Home() {
+	// isLoading: 로딩중일 경우 true를 받음. data:json데이터. ["rooms"]: 데이터를 찾는 키, 해당 키로 값을 찾아올 수 있음.
+	const { isLoading, data } = useQuery(["rooms"], getRooms);  # rooms이름 아래로 데이터들이 저장된다.
+	...
+	{data.map((room) => (  # rooms -> data
+		...
+	))}
+```
 
 코드를 작성하면 room 타입이 지정되지않아서 요류가 발생한다.
 
-    const { isLoading, data } = useQuery<IRoom[]>(["rooms"], getRooms);
-    ...
-    {data?.map((room) => (  # rooms -> data  # data?: data는 null일 수 있다. ?를 붙여준다.
-        ...
-    ))}
+```tsx
+const { isLoading, data } = useQuery<IRoom[]>(["rooms"], getRooms);
+...
+{data?.map((room) => (  // rooms -> data  # data?: data는 null일 수 있다. ?를 붙여준다.
+	...
+))}
+```
 
 ### 19.3 Axios
 
@@ -845,28 +882,34 @@ fetch하고 url이 확인하는 기능을 대신하여 axios를 설치한다. ax
 
 fetch대신 axios를 넣어준다.
 
-    import axios from "axios";
+```ts
+import axios from "axios";
 
-    export async function getRooms() {
-        const response = await axios.get(`${BASE_URL}rooms/`);
-        return response.data;  # json data
-    }
+export async function getRooms() {
+  const response = await axios.get(`${BASE_URL}rooms/`);
+  return response.data; // json data
+}
+```
 
 axios에 base url을 지정하여 관리할 수 있다.
 
-    const instance = axios.create({
-        baseURL: "http://127.0.0.1:8000/api/v2/",
-    });
+```ts
+const instance = axios.create({
+  baseURL: "http://127.0.0.1:8000/api/v2/",
+});
 
-    export async function getRooms() {
-        const response = await instance.get("rooms/");  # base_url에 더해져 url이 형성된다.
-        return response.data;
-    }
+export async function getRooms() {
+  const response = await instance.get("rooms/"); // base_url에 더해져 url이 형성된다.
+  return response.data;
+}
+```
 
 getRooms()를 화살표 함수로 함축해본다.
 
-    export const getRooms = () =>
-        instance.get("rooms/").then((response) => response.data);
+```ts
+export const getRooms = () =>
+  instance.get("rooms/").then((response) => response.data);
+```
 
 ### 19.4 Room Detail
 
@@ -875,50 +918,61 @@ getRooms()를 화살표 함수로 함축해본다.
 react-router의 Link를 사용하여 room앱을 감싼다.
 @src/components/room.tsx
 
-    import { Link } from "react-router-dom";
+```tsx
+import { Link } from "react-router-dom";
 
-    export default function Room(
-        ...
-    ) {
-    return (
-        <Link to={"[임의의 url]"}>
-            <VStack alignItems={"flex-start"}>
-                ...
-            </VStack>
-        </Link>
+export default function Room(
+	...
+) {
+return (
+	<Link to={"[임의의 url]"}>
+		<VStack alignItems={"flex-start"}>
+			...
+		</VStack>
+	</Link>
+```
 
 브라우져에서 room 객체를 클릭하면 not found화면으로 이동된다.
 home에서 pk데이터를 room에 전달하여 url에 추가해준다.
 
-    <Link to={`/rooms/${pk}`}>
+```tsx
+<Link to={`/rooms/${pk}`}>
+```
 
 room객체를 클릭하면 url이 해당 pk값이 포함되어 변경되는 것이 확인된다.
 해당 url의 RoomDetail 페이지를 생성한다.
 @src/routes/RoomDetail.tsx
 
-    export default function RoomDetail() {
-        return <h1>hello!!</h1>;
-    }
+```tsx
+export default function RoomDetail() {
+  return <h1>hello!!</h1>;
+}
+```
 
-@src/router
+@src/router.tsx
 
-    children: [
-      ... ,
-      {
-        path: "rooms/:roomPk",
-        element: <RoomDetail />,
-      },
+```tsx
+children: [
+	... ,
+	{
+		path: "rooms/:roomPk",
+		element: <RoomDetail />,
+	},
+	...
+```
 
 home화면에서 room객체를 선택하면 RoomDetail화면으로 이동된다.
 
 useParams() 훅을 사용하여 url에 있는 모든 변수를 가져온다.
-@src/routes/RoomDetail
+@src/routes/RoomDetail.tsx
 
-    export default function RoomDetail() {
-        const params = useParams();
-        console.log(params);
-        ...
-    }
+```tsx
+export default function RoomDetail() {
+	const params = useParams();
+	console.log(params);
+	...
+}
+```
 
 router에서 특정 pk를 전송하면서 해당 pk로 파라미터를 가져온다.
 해당 파라미터로 fetch하는 함수를 생성한다.
@@ -928,13 +982,17 @@ router에서 특정 pk를 전송하면서 해당 pk로 파라미터를 가져온
 
 api.ts에 임의의 pk로 함수를 생성한다.
 
-    export const getRoom = () =>
-        instance.get(`rooms/11`).then((response) => response.data);
+```ts
+export const getRoom = () =>
+  instance.get(`rooms/11`).then((response) => response.data);
+```
 
 fetch함수로 roomdetail에서 값을 가져온다.
-@routes/RoomDetail
+@routes/RoomDetail.tsx
 
-    const {isLoading, data} = useQuery([`room:${roomPk}`], getRoom);
+```tsx
+const { isLoading, data } = useQuery([`room:${roomPk}`], getRoom);
+```
 
 data변수에 backend model에 있는 데이터를 가져온다.
 
@@ -949,50 +1007,70 @@ devtool을 설치한다.
 
 root.tsx에 devtool을 import 한다.
 
-    import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+```tsx
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-    ...
-        return (
-            <Box>
-                ...
-                <ReactQueryDevtools />
-            </Box>
-        ...
+...
+	return (
+		<Box>
+			...
+			<ReactQueryDevtools />
+		</Box>
+	...
+```
 
 app을 실행하면 브라우져 왼쪽 하단에 꽃모양 버튼이 생성된다. 클릭하면 캐시에 저장된 query를 확인 할 수 있다.
 
 변수를 fetch함수로 보내는 방법을 적용해본다. room데이터를 받을때 2개의 array로 값을 받도족 적용하겠다.
 
-    const { isLoading, data } = useQuery([`rooms`, roomPk], getRoom);
+```tsx
+const { isLoading, data } = useQuery([`rooms`, roomPk], getRoom);
+```
 
 아직까지 getRoom에서 데이터를 받을 공간이 없어서 만들어 줘야한다. useQuery가 getRoom을 호출할때 매게변수를 보내준다.
 @src/api.ts
 
-    export const getRoom = (someting) =>
-        ...
-        console.log(someting)  // >>>: {queryKey: Array(2), pageParam: undefined, meta: undefined}
-                                        queryKey: Array(2)
-                                            0: "rooms"
-                                            1: undefined
-                                            length: 2
-                                            ...
+```ts
+export const getRoom = (someting) =>
+	...
+	console.log(someting)
+```
+
+```shell
+	>>>:
+	{
+		queryKey: Array(2),
+		pageParam: undefined,
+		meta: undefined,
+		queryKey: Array(2),
+		0: "rooms",
+		1: undefined,
+		length: 2,
+		...
+```
 
 queryKey 배열에 1번에 값을 찾지 못하고 있다.
 @src/router path속성값이 rooms/:room_pk로 되어 있으면서 변수명이 일치하지 않아 찾지 못했었다. roomPk로 변경.
 
 매개변수에서 queryKey값만 가져오도록 하겠다. 인수타입은 react-query에 가져와서 사용한다. 데이터 전송에 해당 queryKey의 pk를 보내준다.
 
-    import { QueryFunctionContext } from "@tanstack/react-query";
+```tsx
+import { Quee.geryFunctionContext } from "@tanstack/react-query";
 
-    export const getRoom = ({queryKey}:QueryFunctionContext) =>
-        instance.get(`rooms/${queryKey[1]}`).then...
+export const getRoom = ({queryKey}:QueryFunctionContext) =>
+	instanct(`rooms/${queryKey[1]}`).then...
+```
 
 pk값을 변수에 저장하여 값의 의미를 남겨놓도록 적용하는 것이 좋다.
 
-    const [_, roomPk] = queryKey;  // array의 길이가 2이다.
-    instance.get(`rooms/${roomPk}`).then...
+```tsx
+const [_, roomPk] = queryKey;  // array의 길이가 2이다.
+instance.get(`rooms/${roomPk}`).then...
+```
 
 적용 후 브라우져에서 확인을 하면 devtools의 Data Explorer에서 데이터를 확인 할 수 있다. #19.5 Devtools and Query Keys_1 참조
+
+![#19.5 Devtools and Query Keys_1](https://raw.githubusercontent.com/byeon2261/airbnb-clone-frontend/main/__img/%2319.5%20Devtools%20and%20Query%20Keys_1.png)
 
 ### 19.6 Photos Grid
 
@@ -1002,67 +1080,79 @@ pk값을 변수에 저장하여 값의 의미를 남겨놓도록 적용하는 �
 
 기존에 Home.tsx의 타입정의 코드를 삭제하고 type.d를 import하여 타입을 지정한다.
 
-    import { IRoomList } from "../type";
+```ts
+import { IRoomList } from "../type";
 
-    export default function Home() {
-        ... = useQuery<IRoomList[]>...
+export default function Home() {
+	... = useQuery<IRoomList[]>...
+```
 
 RoomDetail에도 적용해준다.
 
 detail화면을 구성하는데 skeleton기능도 넣어준다.
 
-    <Skeleton h={"43px"} w={"50%"} isLoaded={!isLoading}>
-        <Heading>{data?.name}</Heading>
-    </Skeleton>
+```tsx
+<Skeleton h={"43px"} w={"50%"} isLoaded={!isLoading}>
+  <Heading>{data?.name}</Heading>
+</Skeleton>
+```
 
 하단 별점, 지역 및 share, like 버튼도 생성한다.
 
 detail화면에서 방 사진을 5개 가져온다.
 
-    <Grid
-        mt={4}
-        h="60vh"
-        templateRows={"1fr 1fr"}  // 탬플릿아이템이 1:1 비율로 생성
-        templateColumns={"repeat(4, 1fr)"}
-    >
-        {data?.photos.slice(0, 5).map((photo) => (  // slice(start, end): 아이템을 일부만 가져온다.
-            <Box overflow={"hidden"} key={photo.pk}>
-                <Image w={"100%"} h={"100%"} src={photo.file} />  // w,h=100%: templateRows 속성에 맞게 적용하기위해 사용
-            ...
+```tsx
+<Grid
+	mt={4}
+	h="60vh"
+	templateRows={"1fr 1fr"}  // 탬플릿아이템이 1:1 비율로 생성
+	templateColumns={"repeat(4, 1fr)"}
+>
+	{data?.photos.slice(0, 5).map((photo) => (  // slice(start, end): 아이템을 일부만 가져온다.
+		<Box overflow={"hidden"} key={photo.pk}>
+			<Image w={"100%"} h={"100%"} src={photo.file} />  // w,h=100%: templateRows 속성에 맞게 적용하기위해 사용
+		...
+```
 
 detail화면에서 방 사진을 5개를 표시하는데 대표사진을 크게 하나 보여주고 오른쪽으로 남은 4개 사진을 합친 크기가 대표사진 크기와 같게 표현한다.
 GridItem을 사용해준다.
 
-    <GridItem
-        colSpan={index === 0 ? 2 : 1}  // column 길이
-        rowSpan={index === 0 ? 2 : 1}  // row 길이
-        overflow={"hidden"}
-        key={photo.pk}
-    >
-        <Image objectFit={"cover"} w={"100%"} h={"100%"} src={photo.file} />
-    </GridItem>
+```tsx
+<GridItem
+  colSpan={index === 0 ? 2 : 1} // column 길이
+  rowSpan={index === 0 ? 2 : 1} // row 길이
+  overflow={"hidden"}
+  key={photo.pk}
+>
+  <Image objectFit={"cover"} w={"100%"} h={"100%"} src={photo.file} />
+</GridItem>
+```
 
 사진 폼 끝부분을 rounded준다.
 
-    <Grid
-        ...
-        rounded="lg"
-        overflow={"hidden"}
-    >
+```tsx
+<Grid
+	...
+	rounded="lg"
+	overflow={"hidden"}
+>
+```
 
 room img도 skeleton기능을 구현한다. 데이터가 들어오기전에 생성되어야하기때문에 임의 list를 만들어서 skeleton을 생성한다.
 
-    {[0, 1, 2, 3, 4].map((index) => (
-        <GridItem
-            ...
-            key={index}
-        >
-            <Skeleton h={"100%"} w={"100%"} isLoaded={!isLoading}>
-                <Image
-                    ...
-                    src={data?.photos[index].file}
-                />
-            ...
+```tsx
+{[0, 1, 2, 3, 4].map((index) => (
+	<GridItem
+		...
+		key={index}
+	>
+		<Skeleton h={"100%"} w={"100%"} isLoaded={!isLoading}>
+			<Image
+				...
+				src={data?.photos[index].file}
+			/>
+		...
+```
 
 ### 19.7 Reviews
 
@@ -1070,95 +1160,120 @@ room img도 skeleton기능을 구현한다. 데이터가 들어오기전에 생�
 
 room img 및에 방 제목과 toilet, room 개수를 표시하는 칸을 생성한다.
 
-    <HStack mt={10}>  // 이미지는 가로정렬
-        <VStack>  // 나머지 데이터는 세로 정렬
-          <Heading fontSize={"2xl"}>House Hosted by {data?.owner.name}</Heading>
-          <HStack justifyContent={"flex-start"} w={"100%"}>  // 속성을 사용하지 않으면 중간에서 시작한다.
-            <Text>
-              {data?.toilets} toilet{data?.toilets === 1 ? "" : "s"} // 두개이상일경우 "s"를 붙여준다.
-            </Text>
-            <Text>•</Text>
-            <Text>
-              {data?.rooms} room{data?.rooms === 1 ? "" : "s"}
-            </Text>
-          </HStack>
-        </VStack>
-      </HStack>
+```tsx
+// 이미지는 가로정렬
+<HStack mt={10}>
+  // 나머지 데이터는 세로 정렬
+  <VStack>
+    <Heading fontSize={"2xl"}>House Hosted by {data?.owner.name}</Heading>
+    // "flex-start" 속성을 사용하지 않으면 중간에서 시작한다.
+    <HStack justifyContent={"flex-start"} w={"100%"}>
+      <Text>
+        {data?.toilets} toilet{data?.toilets === 1 ? "" : "s"} // 두개이상일경우
+        "s"를 붙여준다.
+      </Text>
+      <Text>•</Text>
+      <Text>
+        {data?.rooms} room{data?.rooms === 1 ? "" : "s"}
+      </Text>
+    </HStack>
+  </VStack>
+</HStack>
+```
 
 Avatar 컴포넌트를 사용하여 avatar를 표시해준다.
 
-    <HStack ...>
-        ...
-        //이미지를 로드해오지 못할 경우 name 속성을 표기해준다.
-        <Avatar name={data?.owner.name} size={"xl"} src={data?.owner.avatar} />
-    ...
+```tsx
+<HStack ...>
+	...
+	//이미지를 로드해오지 못할 경우 name 속성을 표기해준다.
+	<Avatar name={data?.owner.name} size={"xl"} src={data?.owner.avatar} />
+...
+```
 
 skeleton을 구성한다. headgin과 Text를 감싸준다.
 
-    <HStack ...>
-        <VStack alignItems={"flex-start"}>
-            <Skeleton h={"29px"} isLoaded={!isLoading}>
-                ...
-            </Skeleton>
-            <Skeleton ...>
-                ...
+```tsx
+<HStack ...>
+	<VStack alignItems={"flex-start"}>
+		<Skeleton h={"29px"} isLoaded={!isLoading}>
+			...
+		</Skeleton>
+		<Skeleton ...>
+			...
+```
 
 이제 이 review페이지를 위한 fetch코드를 추가한다.
 
 @src/api. 기존 getRooom에서 reviews로 가는 것 말고는 같다.
 
-    ...
-    return instance
-        .get(`rooms/${roomPk}/reviews`)
-        ...
-    };
+```tsx
+...
+return instance
+	.get(`rooms/${roomPk}/reviews`)
+	...
+};
+```
 
 @src/routes/RoomDetail
 
-    const { isLoading: reviewsIsLoading, data: reviewsData } = useQuery(  // 이미 변수명이 있기때문에 변경
-        [`rooms`, roomPk, `reviews`],
-        getRoomReviews
-    );
+```tsx
+// 이미 변수명이 있기때문에 변경
+const { isLoading: reviewsIsLoading, data: reviewsData } = useQuery(
+  [`rooms`, roomPk, `reviews`],
+  getRoomReviews
+);
+```
 
 review데이터를 roomDetail 하단에 구현한다.
 
-    <Box mt={10}>
-        <Heading fontSize={"2xl"}>
-            <HStack>
-                <FaStar />
-                <Text>{data?.rating}</Text>
-            </HStack>
-        </Heading>
-    </Box>
+```tsx
+<Box mt={10}>
+  <Heading fontSize={"2xl"}>
+    <HStack>
+      <FaStar />
+      <Text>{data?.rating}</Text>
+    </HStack>
+  </Heading>
+</Box>
+```
 
 reviews의 수를 표시할려고 한다. reviews.length를 사용하기 위해서는 reviews의 타입이 정의 되어야 한다.
 
-@src/type
+@src/type.d.ts
 
-    export interface IReview {
-        ...
-    }
+```ts
+export interface IReview {
+	...
+}
+```
 
-@src/routes/roomDetail
+@src/routes/roomDetail.tsx
 
-    ... = useQeury<IReview>(...)
+```tsx
+... = useQeury<IReview>(...)
+```
 
 ### 19.8 Conclusions
 
 Review칸을 구성해본다. 화면에 2개 리뷰 컬럼이 놓아지고 정렬되는 방식으로 구현한다.
 
-    <Grid gap={5} templateColumns={"1fr 1fr"}>
-        {reviewsData?.map((review, index) => (
-            <VStack alignItems={"flex-start"} key={index}>
-                ...
+```tsx
+<Grid gap={5} templateColumns={"1fr 1fr"}>
+	{reviewsData?.map((review, index) => (
+		<VStack alignItems={"flex-start"} key={index}>
+			...
+```
 
 컬럼을 구성한다.
 
 grid가 커서 컬럼간의 간격이 넓다. grid를 container 컴포넌트에 넣어준다.
 
-    <Container MarginX="none">  // 가로정렬이 가운데로 되어 있다.
-        <Grid ...>
-        ...
+```tsx
+<Container MarginX="none">  // 가로정렬이 가운데로 되어 있다.
+	<Grid ...>
+	...
+```
 
 ## 20 Authentication
 
