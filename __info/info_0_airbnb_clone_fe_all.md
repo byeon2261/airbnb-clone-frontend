@@ -1,3 +1,5 @@
+# Airbnb clone Front-end
+
 ## 17 Front-End SetUp
 
 #### [1_React]
@@ -1284,68 +1286,88 @@ header에서 authentication을 알 수 있도록 구현한다. hook을 만들어
 fetcher function을 생성한다.
 @src/api.ts
 
-    export const getMe = () =>
-        instance.get(`user/me`).then((response) => response.data);
+```ts
+export const getMe = () =>
+  instance.get(`user/me`).then((response) => response.data);
+```
 
 src/lib 폴더를 생성한다. useUser hook을 생성해준다.
 
 @src/lib/useUser.ts, error까지 사용해준다.
 
-    export default function useUser() {
-        const { isLoading, data, error } = useQuery(["me"], getMe);
-        console.log(error);
-        return;
-    }
+```ts
+export default function useUser() {
+  const { isLoading, data, error } = useQuery(["me"], getMe);
+  console.log(error);
+  return;
+}
+```
 
 @src/components/header 에 useUser훅을 추가해준다.
 
-    useUser()
+```tsx
+useUser();
+```
 
 header 컴포넌트는 어디에서든 호출이 되니 아무 페이지에서 확인 할 수 있다. #20.0 useUser_1 참조
 
+![#20.0 useUser_1](https://raw.githubusercontent.com/byeon2261/airbnb-clone-frontend/main/__img/%2320.0%20useUser_1.png)
+
 error대신 isError를 사용하겠다. isError는 error여부에 따라 boolean값을 반환한다.
 
-return값에 object를 반환하겠다. key와 value값이 같가면 변수명처럼 보내줄 수 있다.
+return값에 object를 반환하겠다. key와 value값이 같다면 변수명처럼 보내줄 수 있다.
 
-    isLoading: isLoading, -> isLoading,
-    user: data,
-    isLoggedIn: !isError,  // isError가 false일때 에러가 없기때문에 로그인이 되었다고 판단.
+```tsx
+isLoading,  // <- isLoading: isLoading,
+user: data,
+isLoggedIn: !isError,  // isError가 false일때 에러가 없기때문에 로그인이 되었다고 판단.
+```
 
 Header에 user로그인이 되었다면 login sign up버튼을 안보이도록 적용한다.
 
-        {!userLoading && !isLoggedIn ? (
-          <>  // fragment. 하나의 엘리멘트만 전송이 가능해서 묶어준다.
-            <Button onClick={onLoginOpen}>Log in</Button>
-            <LightMode>
-              <Button onClick={onSignUpOpen} colorScheme={"red"}>
-                Sign up
-              </Button>
-            </LightMode>
-          </>
-        ) : (
-          <Avatar />
-        )}
+```tsx
+{
+  !userLoading && !isLoggedIn ? (
+    <>
+      {" "}
+      // fragment. 하나의 엘리멘트만 전송이 가능해서 묶어준다.
+      <Button onClick={onLoginOpen}>Log in</Button>
+      <LightMode>
+        <Button onClick={onSignUpOpen} colorScheme={"red"}>
+          Sign up
+        </Button>
+      </LightMode>
+    </>
+  ) : (
+    <Avatar />
+  );
+}
+```
 
 테스트를 해보면 error가 발생하기 전까지 아바타 이모티콘이 나오다가 login버튼이 나온다. react는 기본으로 fetch를 실패해도 3번을 시도한다.
 시도하는 동안 로그인버튼 대신 아바타가 보인다. 로그인 시도가 아닌 유저 데이터를 가져오는 것은 재시도를 하지 않도록 적용하기로 하겠다.
 
-    useQuery(..., {
-        retry: false,
-    })
+```tsx
+useQuery(..., {
+	retry: false,
+})
+```
 
 이제 바로 로그인 버튼이 나오게 된다.
 
 로딩하는 동안 Avatar 모양이 나오지 않다록 하기 위해서 if문을 변경한다.
 
-    {!userLoading ? (
-        !isLoggedIn ? (
-            <>
-                ...
-            </>
-        ) : (
-            ...
-        )
-    ) : null
+```tsx
+{!userLoading ? (
+	!isLoggedIn ? (
+		<>
+			...
+		</>
+	) : (
+		...
+	)
+) : null
+```
 
 적용 후 python서버에 로그인을 해도 로그인정보를 가져오지 못한다. 해당부분 수정을 진행하도록 하겠다.
 
@@ -1355,21 +1377,22 @@ session authentication은 cookie애 의해 작동된다. 로그인을 하면 Dja
 session은 pk와 user데이터를 갖고 있다. Django는 session pk를 cookie에 담아서 보내준다.
 #20.1 Credentials_1 (cookie Session Id).png 참조
 
+![#20.1 Credentials_1 (cookie Session Id).png](<https://raw.githubusercontent.com/byeon2261/airbnb-clone-frontend/main/__img/%2320.1%20Credentials_1%20(cookie%20Session%20Id).png>)
+
 # ! 쿠키, 캐시, 세션, 로컬 스로테지
 
-    local storage: local에 저장되는 데이터이다. 계속 저장이 된다. 용량의 제한도 없다.
+- local storage: local에 저장되는 데이터이다. 계속 저장이 된다. 용량의 제한도 없다.
 
-    cookie: 요청한 데이터를 서버에서 보내주고 local에 저장해둔다. 쿠키는 데이터 요청시 매번 보내진다.
-        수정사항이 있다면 서버에서 변경된 쿠키를 보내준다.
+- cookie: 요청한 데이터를 서버에서 보내주고 local에 저장해둔다. 쿠키는 데이터 요청시 매번 보내진다.
+  수정사항이 있다면 서버에서 변경된 쿠키를 보내준다.
 
-<https://velog.io/@ejchaid/localstorage-sessionstorage-cookie%EC%9D%98-%EC%B0%A8%EC%9D%B4%EC%A0%90>
+  > [LocalStorage, SessionStorage, Cookie의 차이점 (velog)](https://velog.io/@ejchaid/localstorage-sessionstorage-cookie%EC%9D%98-%EC%B0%A8%EC%9D%B4%EC%A0%90)
 
-    cashe: 웹 페이지 요소를 저장한다. 웹페이지를 빨리 렌더링하기 위해 도와준다. 오디오와 비디오 파일을 저장할 수 있다.
+- cashe: 웹 페이지 요소를 저장한다. 웹페이지를 빨리 렌더링하기 위해 도와준다. 오디오와 비디오 파일을 저장할 수 있다.
 
-    session: 서버에 데이터가 저장된다. cookie는 텍스트형식, session은 object형식으로 저장된다.(db니까..)
-        브라우져 종료시 데이터는 삭제 된다.
-
-<https://hahahoho5915.tistory.com/32>
+- session: 서버에 데이터가 저장된다. cookie는 텍스트형식, session은 object형식으로 저장된다.(db니까..)
+  브라우져 종료시 데이터는 삭제 된다.
+  > [쿠키(Cookie), 세션(Session) 특징 및 차이 (tistory)](https://hahahoho5915.tistory.com/32)
 
 Django가 쓰는 url과 react가 쓰는 url이 다르기때문에 장고서버에서 react url로 쿠키가 전송되지 않는다. (도메인이 같지 않다.)
 react페이지를 도메인을 갖게 적용을 하면 데이터를 가져올 수 없다. Django에서는 fetch가 가능한 도메인을 적용해야한다.
@@ -1386,19 +1409,23 @@ react페이지는 fetch를 하여 데이터를 가져오기 때문에 javascript
 
 @src/api.ts
 
-    const instance = axios.create({
-        ... ,
-        withCredentials: true,
-    });
+```ts
+const instance = axios.create({
+	... ,
+	withCredentials: true,
+});
+```
 
 적용 후 송신 에러가 발생한다.
 
-    Access to XMLHttpRequest at 'http://127.0.0.1:8000/api/v2/rooms/'
-    from origin 'http://127.0.0.1:3000' has been blocked by CORS policy:
-    The value of the 'Access-Control-Allow-Credentials' header in the
-    response is '' which must be 'true' when the request's credentials
-    mode is 'include'. The credentials mode of requests initiated by
-    the XMLHttpRequest is controlled by the withCredentials attribute.
+```shell
+Access to XMLHttpRequest at 'http://127.0.0.1:8000/api/v2/rooms/'
+from origin 'http://127.0.0.1:3000' has been blocked by CORS policy:
+The value of the 'Access-Control-Allow-Credentials' header in the
+response is '' which must be 'true' when the request's credentials
+mode is 'include'. The credentials mode of requests initiated by
+the XMLHttpRequest is controlled by the withCredentials attribute.
+```
 
 Django에서 credential을 받도록 적용해야한다.
 
@@ -1408,23 +1435,25 @@ Django 적용 후 react페이지에서 로그인확인이 가능하다.
 
 # ! Django와 react를 사용하는 브라우져 일치시켜야함
 
-    두 페이지를 사용하는 브라우져가 같아야 인증에 문제가 발생하지 않는다고 한다.
-    내 프로젝트 작업을 진행하는 동안에는 문제가 발생하지 않았다.
+두 페이지를 사용하는 브라우져가 같아야 인증에 문제가 발생하지 않는다고 한다.
+내 프로젝트 작업을 진행하는 동안에는 문제가 발생하지 않았다.
 
 ### 20.3 Log Out
 
 로그아웃 기능을 구현한다. 우선 menu, menubutton 컴포넌트로 header의 avatar을 감싸준다.
 
-@src/components/header
+@src/components/header.tsx
 
-    <Menu>
-        <MenuButton>
-            <Avatar ... />
-        </MenuButton>
-        <MenuList>
-            <MenuItem>Log out</MenuItem>
-        </MenuList>
-    </Menu>
+```tsx
+<Menu>
+	<MenuButton>
+		<Avatar ... />
+	</MenuButton>
+	<MenuList>
+		<MenuItem>Log out</MenuItem>
+	</MenuList>
+</Menu>
+```
 
 구현 후 Avatar를 클릭하면 리스트처럼 하단에 Log out이 나온다.
 
@@ -1433,71 +1462,83 @@ Django 적용 후 react페이지에서 로그인확인이 가능하다.
 
 @src/api.ts
 
-    export const logOut = () =>
-        instance.post("users/log-out").then((response) => response.data);
+```ts
+export const logOut = () =>
+  instance.post("users/log-out").then((response) => response.data);
+```
 
-@src/components/header
+@src/components/Header.tsx
 
-    <MenuItem onclick={logOut}>...</MenuItem>
+```tsx
+<MenuItem onclick={logOut}>...</MenuItem>
+```
 
 logOut 데이터를 담는 onLogOut()를 생성해준다.
 
-    const onLogOut = async () => {
-        const data = await logOut();
-        console.log(data);
-    };
+```tsx
+const onLogOut = async () => {
+  const data = await logOut();
+  console.log(data);
+};
+```
 
 로그아웃을 테스트해 본다.
 
 # ! console에 요청 실패 오류메세지
 
-    console에 요청 실패 오류메세지가 발생한다고 하는데 본인이 테스트를 진행하면 오류가 발생하지 않음.
-    (CSRF Failed 이 발생한다고 한다.)
+console에 요청 실패 오류메세지가 발생한다고 하는데 본인이 테스트를 진행하면 오류가 발생하지 않음.
+(CSRF Failed 이 발생한다고 한다.)
 
-    오류가 발행하는 원인이 정리된 게시글이다.
-
+오류가 발행하는 원인이 정리된 게시글이다.
 <https://han-py.tistory.com/352>
-
 다음 강의에 요청실패하는 원인과 해결을 알려준다고 하니 대기.
 
-Toast hook을 사용하여 authentication을 알려주는 기능을 구현한다.
+!! 추후에 나오지만 basic인증기능을 사용하여 로그인이 되어있어서 오류가 발생하지 않았던 거다.
+이전에 backend에서 테스트용으로 사용했던 기능을 삭제하지 않고 냅뒀던것이 영향을 미친것.
+이제는 어디서도 basic인증기능을 사용하지 않기때문에 인증오류가 발생하는 것은 당연하다.
 
+Toast hook을 사용하여 authentication을 알려주는 기능을 구현한다.
 <https://chakra-ui.com/docs/components/toast>
 
-    const onLogOut = async () => {
-        toast({
-            title: "Good bye!!",
-            description: "Log out Completed.",
-            status: "success",  // toast body색상, 아이콘이 변경된다.
-            isClosable: true,  // 종료 아이콘이 생성된다.
-            duration: 6000,  // 6초 뒤에 사라진다.
-        });
-    };
+```tsx
+const onLogOut = async () => {
+  toast({
+    title: "Good bye!!",
+    description: "Log out Completed.",
+    status: "success", // toast body색상, 아이콘이 변경된다.
+    isClosable: true, // 종료 아이콘이 생성된다.
+    duration: 6000, // 6초 뒤에 사라진다.
+  });
+};
+```
 
 toast update()를 통해 toast변경이 가능하다. 임의로 딜레이 시간을 줘서 테스트를 진행한다.
 
-    const toastId = toast({
-        ...
-    })
+```tsx
+const toastId = toast({
+	...
+})
 
-    setTimeout(() => {
-        toast.update(toastId, {
-            ...  // 변경될 속성들
-        })
-    }, 5000)
+setTimeout(() => {
+	toast.update(toastId, {
+		...  // 변경될 속성들
+	})
+}, 5000)
+```
 
 # ! MenuButton의 Avatar를 클릭시 css 경고 메세지
 
-    MenuButton의 Avatar를 클릭시 css 경고 메세지가 발생한다.
+MenuButton의 Avatar를 클릭시 css 경고 메세지가 발생한다.
 
-    >>>: createPopper.js:110 Popper: CSS "margin" styles cannot be used
-    to apply padding between the popper and its reference element or
-    boundary. To replicate margin, use the `offset` modifier, as well
-    as the `padding` option in the `preventOverflow` and `flip` modifiers.
+```shell
+>>>: createPopper.js:110 Popper: CSS "margin" styles cannot be used
+to apply padding between the popper and its reference element or
+boundary. To replicate margin, use the `offset` modifier, as well
+as the `padding` option in the `preventOverflow` and `flip` modifiers.
+```
 
-    HStack대신에 Flex를 사용하여 해결이 가능하다.
-
-<https://github.com/kjh910/airbnb-clone/blob/1a1db114aba436790eab8e166454ca3c8bc3a8f2/airbnb-clone-frontend/app/src/components/organisms/header/header.tsx#L67>
+HStack대신에 Flex를 사용하여 해결이 가능하다.
+[Airbnb clon강의 댓글의 깃허브 URL](https://github.com/kjh910/airbnb-clone/blob/1a1db114aba436790eab8e166454ca3c8bc3a8f2/airbnb-clone-frontend/app/src/components/organisms/header/header.tsx#L67)
 
 ### 20.4 CSRF
 
@@ -1505,8 +1546,7 @@ Django는 어떠한 사이트에서든 post 요청을 신뢰하지 않으며 공
 CSRF는 cross-site request forgery로써 해커가 사용하는 공격의 일종으로 해커의 사이트로부터 post요청을 보내도록 속이는 방법이다.
 credential를 이용하여 정보를 훔치는 목적으로 사용된다.
 
-CSRF 공격이란? 그리고 CSRF 방어 방법
-<https://itstory.tk/entry/CSRF-%EA%B3%B5%EA%B2%A9%EC%9D%B4%EB%9E%80-%EA%B7%B8%EB%A6%AC%EA%B3%A0-CSRF-%EB%B0%A9%EC%96%B4-%EB%B0%A9%EB%B2%95>
+[CSRF 공격이란? 그리고 CSRF 방어 방법 (itstory)](https://itstory.tk/entry/CSRF-%EA%B3%B5%EA%B2%A9%EC%9D%B4%EB%9E%80-%EA%B7%B8%EB%A6%AC%EA%B3%A0-CSRF-%EB%B0%A9%EC%96%B4-%EB%B0%A9%EB%B2%95)
 
 Django에 post가능한 url을 추가해준다.
 
@@ -1514,31 +1554,41 @@ Django에 post가능한 url을 추가해준다.
 
 Django에 추가를 해주면 기존에 발생하던 오류가 변경된다. post요청을 보낼때 CSRF token을 같이 보내줘야 한다.
 보안 기능이므로 보내주는 것을 구현한다.(cookie에 csrftoken이 있다.) 기능구현을 위해 js-cookie를 설치한다.
-
 <https://www.npmjs.com/package/js-cookie>
 
-    $ npm i js-cookie  // ! 설치 다 안됨.
+```shell
+$ npm i js-cookie  # ! 설치 다 안됨.
+```
 
 사용을 위해 import를 하면 타입을 알 수 없기때문에 설치할 때 속성을 추가해달라는 ts오류가 발생한다.
 
-    import Cookie from "js-cookie";
+```tsx
+import Cookie from "js-cookie";
+```
 
-    >>>: Try `npm i --save-dev @types/js-cookie` if it exists or add a new declaration
-    (.d.ts) file containing `declare module 'js-cookie';`
+```shell
+>>>: Try `npm i --save-dev @types/js-cookie` if it exists or add a new declaration
+(.d.ts) file containing `declare module 'js-cookie';`
+```
 
-다시 설치해준다.
+제시해준 명령어로 다시 설치해준다.
 
     $ npm i --save-dev @types/js-cookie
 
 logOut에 token을 담아주도록 적용한다.
 
-    export const logOut = () =>
-        instance
-            .post(`users/log-out`, null, {  // post두번째 자리에는 보내줄 data를 지정한다.
-                // 앱은 CSRF 토큰을 획득하기 위해 헤더에 X-CSRF-Token: fetch를 포함하여야 한다.
-                headers: { "X-CSRFToken": Cookie.get("csfrtoken") },
-            })
-            .then((response) => response.data);
+@Header.tsx
+
+```tsx
+export const logOut = () =>
+  instance
+    // post두번째 자리에는 보내줄 data를 지정한다.
+    .post(`users/log-out`, null, {
+      // 앱은 CSRF 토큰을 획득하기 위해 헤더에 X-CSRF-Token: fetch를 포함하여야 한다.
+      headers: { "X-CSRFToken": Cookie.get("csfrtoken") },
+    })
+    .then((response) => response.data);
+```
 
 <https://binchoo.tistory.com/46>
 
@@ -1548,51 +1598,56 @@ logOut에 token을 담아주도록 적용한다.
 queryClient에는 우리가 fetch한 모든 query와 data가 있다.
 query client를 사용하여 log out시 refetch기능을 구현하도록 하겠다.
 
-@src/components/header
+@src/components/header.tsx
 
-    const queryClient = useQueryClient();
-    const onLogOut = async () => {
-        const toastId = toast({
-            ...
-        });
-        await logOut();
-        // @src/lib/useUser 에 query를 생성할때 쿼리명을 me로 지정하였다.
-        queryClient.refetchQueries(["me"]);  // refetch할 query명을 넣어준다.
-        toast.update(toastId, {
-            ...
-        });
-    };
+```tsx
+const queryClient = useQueryClient();
+const onLogOut = async () => {
+	const toastId = toast({
+		...
+	});
+	await logOut();
+	// @src/lib/useUser 에 query를 생성할때 쿼리명을 me로 지정하였다.
+	queryClient.refetchQueries(["me"]);  // refetch할 query명을 넣어준다.
+	toast.update(toastId, {
+		...
+	});
+};
+```
 
 # ! react 로그인화면 계속 유지
 
-    react페이지는 로그아웃을 진행해도 페이지 변화가 발생하지 않는다. Django 페이지에 가면 로그아웃이 됨.
-    로그아웃 상태에서 !isLoggedIn를 console에 출력하면 false가 나옴.
-    !! 로그인이 안되어있어도 user데이터를 가져오는데 에러가 발생 안한다. 어느 유저로 로그아웃을 했든 gh의 아이디정보가 나온다.
+react페이지는 로그아웃을 진행해도 페이지 변화가 발생하지 않는다. Django 페이지에 가면 로그아웃이 됨.
+로그아웃 상태에서 !isLoggedIn를 console에 출력하면 false가 나옴.
+? 로그인이 안되어있어도 user데이터를 가져오는데 에러가 발생 안한다. 어느 유저로 로그아웃을 했든 gh의 아이디정보가 나온다.
 
 이전에 CSRF Failed 메세지도 발생하지 않고 가져올 user 데이터도 없는데 useUser query에서 에러가 발생하지 않는다. ??
 django와 react 여는 브라우져가 달라서 발생하는 오류 일까.
+브라우져의 탭을 전체 종료 후 다시 실행을 하니 유저 데이터가 나오지 않는다.
 
-    브라우져의 탭을 전체 종료 후 다시 실행을 하니 유저 데이터가 나오지 않는다.
-    !!! users/me에 접근할때 브라우져에서 로그인창이 뜬다. 해당 창에서 로그인했던 데이터가 계속 나온거같다.
-    예전에 로그인창이 뜨길래 로그인한적이 있다. gh 아이디로 로그인을 했었다. 해당 정보가 어딘가 남아서 계속 나온듯 싶다.
-    react페이지에서 로그인창이 사라지지 않고 계속 나온다. 해당부분 수정을 진행해야한다.
+!!! users/me에 접근할때 브라우져에서 로그인창이 뜬다. 해당 창에서 로그인했던 데이터가 계속 나온거같다.
+예전에 로그인창이 뜨길래 로그인한적이 있다. gh 아이디로 로그인을 했었다. 해당 정보가 어딘가 남아서 계속 나온듯 싶다.
+react페이지에서 로그인창이 사라지지 않고 계속 나온다. 해당부분 수정을 진행해야한다.
 
+basic인증 기능을 사용하여 발생한 기능이다.
 로그인 창은 #20.4 CSRF_1 (로그인 창) 참조.
+
+![#20.4 CSRF_1](<https://raw.githubusercontent.com/byeon2261/airbnb-clone-frontend/main/__img/%2320.4%20CSRF_1%20(로그인%20창).png>)
 
 Django에서 로그인 후 react페이지에서 log out 테스트 진행.
 
 # ! 이제서야 CSRF오류가 발생
 
-    테스트를 위해 Django의 CSRF_TRUSTED_ORIGINS 설정을 주석처리 했었다.
-    원복진행 후 로그 아웃하니 정상 작동한다. 로그인 창은 계속 뜬다.
+테스트를 위해 Django의 CSRF_TRUSTED_ORIGINS 설정을 주석처리 했었다.
+원복진행 후 로그 아웃하니 정상 작동한다. 로그인 창은 계속 뜬다.
 
 # 오류해결 정리
 
-    처음 react페이지를 열었을 때 로그인 창이 떳던 이유는 Django에 settings의 설정때문이였다.
-    인증 클래스에 BasicAuthentication 기능이 추가되어 있어서 로그인창이 떴다. 해당 기능을 지우면 로그인창이 뜨지 않는다.(모든 오류의 원흉)
+처음 react페이지를 열었을 때 로그인 창이 떳던 이유는 Django에 settings의 설정때문이였다.
+인증 클래스에 BasicAuthentication 기능이 추가되어 있어서 로그인창이 떴다. 해당 기능을 지우면 로그인창이 뜨지 않는다.(모든 오류의 원흉)
 
-    CSRF 오류가 발생하지 않았던 이유는 로그인창에서 등록한 유저 정보가 있어서
-    Django에 user정보를 요구를 하지 않아 오류가 발생하지 않았다.
+CSRF 오류가 발생하지 않았던 이유는 로그인창에서 등록한 유저 정보가 있어서
+Django에 user정보를 요구를 하지 않아 오류가 발생하지 않았다.
 
 backend 유저 인증 관련 정보는 #15 Authentication 강의를 참조하자.
 
@@ -1624,35 +1679,45 @@ app을 생성하면 app정보가 나온며 client id가 있다. <https://github.
 
 social login 모달에 기능구현을 한다.
 
-    <Button
-        as={"a"}  // html 태그로 변환이 가능하다. anker로 변환한다.
-        // anker 속성이 사용가능하다.
-        href={"https://github.com/login/oauth/authorize"}  // 유저를 보내야할 url이다. github OAuth 페이지 설명 참조
-        leftIcon={<FaGithub />}
-        ...
-    >
-        Continue with Github
-    </Button>
+```tsx
+<Button
+	as={"a"}  // html 태그로 변환이 가능하다. anker로 변환한다.
+	// anker 속성이 사용가능하다.
+	href={"https://github.com/login/oauth/authorize"}  // 유저를 보내야할 url이다. github OAuth 페이지 설명 참조
+	leftIcon={<FaGithub />}
+	...
+>
+	Continue with Github
+</Button>
+```
 
 github app에 유저를 보낼때 우리의 client_id 파라미터를 같이 보내줘야한다.
 
-    <Button
-        ...
-        href={"...?client_id=f61c955f466d92d1cac9"}
-    >
+```tsx
+<Button
+	...
+	href={"...?client_id=f61c955f466d92d1cac9"}
+>
+```
 
 해당 기능을 구현하면 github login버튼을 클릭하면 github 권한 허가 요청페이지로 이동한다.
+
 #20.5 Github Log In_1 (github 정보 제공 허가).png 참조.
+![#20.5 Github Log In_1 (github 정보 제공 허가).png](<https://raw.githubusercontent.com/byeon2261/airbnb-clone-frontend/main/__img/%2320.5%20Github%20Log%20In_1%20(github%20%EC%A0%95%EB%B3%B4%20%EC%A0%9C%EA%B3%B5%20%ED%97%88%EA%B0%80).png>)
+
 앱 이름과 정보를 제공할 유저의 정보가 나온다. 아직 승인을 누르면 안된다.
 
 기본 셋팅은 공개된 정보만 가져올 수 있다.
 사용자가 우리 웹에서 필요한 데이터를 비공개로 해났을 수 있으니 비공개여도 가져와야할 데이터를 정의하겠다.
 
-    <Button
-        ...
-        href={"...?...&scope=read:user,user:email"}  // scope는 사용자에게 얻고 싶은 정보 목록이다.
-    >
+```tsx
+<Button
+	...
+	href={"...?...&scope=read:user,user:email"}  // scope는 사용자에게 얻고 싶은 정보 목록이다.
+>
+```
 
+Scopes for OAuth Apps.
 <https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps>
 
 적용 후 github login버튼을 클릭하면 사용자에게 요구하는 데이터가 변경된다.
@@ -1666,97 +1731,117 @@ github app에 유저를 보낼때 우리의 client_id 파라미터를 같이 보
 
 github 로그인을 위한 페이지를 생성한다.
 
-@src/routes/GithubConfirm 생성
+@src/routes/GithubConfirm.tsx 생성
 
-    export default function GithubConfirm() {
-        return (
-            <VStack bg={"gray.100"} justifyContent={"center"} minH="100vh">
-                <Heading>Processing log in...</Heading>
-                <Text>Don't go anything.</Text>
-            </VStack>
-        );
-    }
+```tsx
+export default function GithubConfirm() {
+  return (
+    <VStack bg={"gray.100"} justifyContent={"center"} minH="100vh">
+      <Heading>Processing log in...</Heading>
+      <Text>Don't go anything.</Text>
+    </VStack>
+  );
+}
+```
 
 notfound페이지를 가져와서 일부 수정한다.
 
 spinner를 사용하여 로딩중임으로 표현하겠다.
 <https://chakra-ui.com/docs/components/spinner>
 
-    ...
-    <Spinner size="xl" />
+```tsx
+...
+<Spinner size="xl" />
+```
 
 컴포넌트를 router에 연결을 해준다.
 
-@src/router
+@src/router.tsx
 
-      ...
-      {
-        path: "social",
-        children: [
-          {
-            path: "github",
-            element: <GithubConfirm />,
-          },
-        ],
-      },
+```tsx
+...
+{
+	path: "social",
+	children: [
+		{
+			path: "github",
+			element: <GithubConfirm />,
+		},
+	],
+},
+```
 
 kakao로그인도 나중에 추가하므로 children 구성으로 구현한다.
 브라우져에서 해당 url로 이동을 하면 화면이 나온다.
 
 해당 페이지에 도착하게 되면 우리는 github api에서 받은 코드를 backend로 전송한다.
 
-@src/routes/GithubConfirm
+@src/routes/GithubConfirm.tsx
 
-    const location = useLocation();  // 우리가 있는 곳을 알려준다.
-    useEffect(() => {
-        console.log(location);
-    });
+```tsx
+const location = useLocation(); // 우리가 있는 곳을 알려준다.
+useEffect(() => {
+  console.log(location);
+});
+```
 
-    >>>: hash: ""
-        key: "default"
-        pathname: "/api/v2/social/github"
-        search: "?code=15ac72cf76f174002643"
-        state: null
+```shell
+>>>:
+	hash: ""
+	key: "default"
+	pathname: "/api/v2/social/github"
+	search: "?code=15ac72cf76f174002643"
+	state: null
+```
 
 location.search 내 parameter가 있다.
 
 url에서 데이터를 가져올 수 있는 URLSearchParams class가 있다.
 
-    const { search } = useLocation();  // location에서 seacrh만 가져온다.
-    const user = new URLSearchParams(search);
-    console.log(user.get("code"));
+```tsx
+const { search } = useLocation(); // location에서 seacrh만 가져온다.
+const user = new URLSearchParams(search);
+console.log(user.get("code"));
+```
 
-    >>>: 15ac72cf76f174002643
+```shell
+>>>: 15ac72cf76f174002643
+```
 
 이제 해당 코드를 전송할 api function을 생성해준다.
 
-@src.api
+@src.api.ts
 
-    export const githubLogin = (code: string) =>
-        instance
-            .post(
-                `users/github`,
-                { code },
-                {
-                    headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
-                }
-            )
-            .then((response) => response.status);
+```ts
+export const githubLogin = (code: string) =>
+  instance
+    .post(
+      `users/github`,
+      { code },
+      {
+        headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
+      }
+    )
+    .then((response) => response.status);
+```
 
 해당 함수를 이용하여 데이터를 전송해준다.
 
-@src/routes/GithubConfirm
+@src/routes/GithubConfirm.tsx
 
-    const confirmLogin = async () => {
-        const params = new URLSearchParams(search);
-        const code = params.get("code");
-        if (code) {  // code가 null일 수 있다며 오류가 발생한다. 값이 오는것이 확실하더라도 사용해야한다.
-            await githubLogin(code);
-        }
-    };
-    useEffect(() => {
-        confirmLogin();
-    }, []);
+```tsx
+const confirmLogin = async () => {
+  const params = new URLSearchParams(search);
+  const code = params.get("code");
+  if (code) {
+    // code가 null일 수 있다며 오류가 발생한다. 값이 오는것이 확실하더라도 사용해야한다.
+    await githubLogin(code);
+  }
+};
+useEffect(() => {
+  confirmLogin();
+}, []);
+```
 
 이제 backend에 code를 보내준다. 아직 Django에 users/github페이지가 없기때문에 react페이지 콘솔에서 404 오류가 발생한다.
 
@@ -2083,7 +2168,10 @@ required에 true대신에 text를 넣어서 error표시를 변경할 수 있다.
     </InputGroup>
 
 onSubmit이전에는 Text가 보이지 않다가 오류가 발생하면 Input옆에 message가 출력된다.
-(그렇게 예쁘게 출력되지는 않는다. 외국사이트에서는 봤던거 같다. ) #20.13 React Hook Form_1 (register required text) 참조
+(그렇게 예쁘게 출력되지는 않는다. 외국사이트에서는 봤던거 같다. )
+
+#20.13 React Hook Form_1 (register required text) 참조
+![#20.13 React Hook Form_1 (register required text)]()
 
 required text출력대신 error가 발생한 input을 표시해줄수 있다.
 
