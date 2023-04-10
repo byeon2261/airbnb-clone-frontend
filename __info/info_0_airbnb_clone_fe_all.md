@@ -719,7 +719,7 @@ backend셋팅을 한다. aribnb-clone-backend/info/info_0_airbnb_clone_all.md �
 
 ```tsx
 const [isLoading, setIsLoading] = useState(true);
-const [rooms, setRooms] = useState();  # (): undefined
+const [rooms, setRooms] = useState();  // (): undefined
 const fetchRooms = async () => {
 	const response = await fetch("http://127.0.0.1:8000/api/v2/rooms/");
 	const json = await response.json();
@@ -839,13 +839,14 @@ api.ts를 생성하여 api를 패치하기 위한 함수를 다 옮겨준다.
 @src/api.ts
 
 ```tsx
-	const BASE_URL = "http://127.0.0.1:8000/api/v2/";
+const BASE_URL = "http://127.0.0.1:8000/api/v2/";
 
-	export async function getRooms() {  # async: 로딩중인지 확인하기위해 싱크
-		const response = await fetch(`${BASE_URL}rooms/`);
-		const json = await response.json();
-		return json;
-	}
+export async function getRooms() {
+  // async: 로딩중인지 확인하기위해 싱크
+  const response = await fetch(`${BASE_URL}rooms/`);
+  const json = await response.json();
+  return json;
+}
 ```
 
 src/routes/home의 소스를 옮겨준다.
@@ -857,7 +858,7 @@ import { getRooms } from "../api";
 
 export default function Home() {
 	// isLoading: 로딩중일 경우 true를 받음. data:json데이터. ["rooms"]: 데이터를 찾는 키, 해당 키로 값을 찾아올 수 있음.
-	const { isLoading, data } = useQuery(["rooms"], getRooms);  # rooms이름 아래로 데이터들이 저장된다.
+	const { isLoading, data } = useQuery(["rooms"], getRooms);  // rooms이름 아래로 데이터들이 저장된다.
 	...
 	{data.map((room) => (  # rooms -> data
 		...
@@ -1867,21 +1868,21 @@ backend에서 로그인을 진행한다 ...
 
 이제 frontend에서 status code와 response를 요청하도록 한다
 
-@src/routes/GithubConfirm
+@src/routes/GithubConfirm.tsx
 
-    // status(Num)를 받는다
-    // 로그인이 성공하였다면 toast로 로그인되었다고 알려준다.
-    // 리패치를 진행
-    // 홈으로 이동시킴
+1. status(Num)를 받는다
+1. 로그인이 성공하였다면 toast로 로그인되었다고 알려준다.
+1. 리패치를 진행
+1. 홈으로 이동시킴
 
-유저 로그인 기능이 구현되었다.
+유저 로그인 기능이 구현되었다. 이전에 작업했던 기능 그대로 적용하면 된다.
 
 ### 20.9 Kakao Talk App
 
 kakao 로그인 기능을 구현한다. 카카오 개발자 사이트에서 로그인 앱 생성을 진행한다.
 
-    카카오디벨로퍼스 회원가입 진행
-    로그인 앱 생성
+1. 카카오디벨로퍼스 회원가입 진행
+2. 로그인 앱 생성
 
 <https://developers.kakao.com/console/app>
 
@@ -1906,58 +1907,71 @@ redirect URL을 등록한다.
 
 <https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#kakaologin>
 
-@src/routes/KakaoConfirm
+@src/routes/KakaoConfirm.tsx
 
-    export default function KakaoConfirm() {
-        const { search } = useLocation();
-        const confirmLogin = async () => {
-            const params = new URLSearchParams(search);
-            const code = params.get("code");
-            if (code) {
-                await kakaoLogin(code);
-            }
-        };
-        useEffect(() => {
-            confirmLogin();
-        });
-        return ...
+```tsx
+export default function KakaoConfirm() {
+	const { search } = useLocation();
+	const confirmLogin = async () => {
+		const params = new URLSearchParams(search);
+		const code = params.get("code");
+		if (code) {
+			await kakaoLogin(code);
+		}
+	};
+	useEffect(() => {
+		confirmLogin();
+	});
+	return ...
+```
 
-@src/api
+@src/api.ts
 
-    export const kakaoLogin = (code: string) =>
-        instance
-            .post(
-                "users/kakao",
-                { code },
-                {
-                    headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
-                }
-            )
-            .then((response) => response.data);
+```ts
+export const kakaoLogin = (code: string) =>
+  instance
+    .post(
+      "users/kakao",
+      { code },
+      {
+        headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
+      }
+    )
+    .then((response) => response.data);
+```
 
 url과 함수, 컴포넌트 명을 제외하고는 github로그인 로직과 일치한다.
 
 소셜 로그인에 파라미터를 정리하여 관리하도록 로직을 변경한다.
 
-    const kakaoParams = {
-        client_id: "f4fdce8bfd733f3368f97c47a87266b6",
-        redirect_uri: "http://127.0.0.1:3000/api/v2/social/kakao",
-        response_type: "code",
-    };
-    const params = new URLSearchParams(kakaoParams).toString();
-    console.log(params);
+```tsx
+const kakaoParams = {
+  client_id: "f4fdce8bfd733f3368f97c47a87266b6",
+  redirect_uri: "http://127.0.0.1:3000/api/v2/social/kakao",
+  response_type: "code",
+};
+const params = new URLSearchParams(kakaoParams).toString();
+console.log(params);
+```
 
-    >>>: client_id=f4fdce8bfd733f3368f97c47a87266b6&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fapi%2Fv2%2Fsocial%2Fkakao&response_type=code
+```shell
+>>>:
+client_id=f4fdce8bfd733f3368f97c47a87266b6&
+redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fapi%2Fv2%2Fsocial%2Fkakao&
+response_type=code
+```
 
 해당 데이터를 URL에 파라미터를 넣어준다.
 
-    <Button
-        as={"a"}
-        href={`/oauth/authorize?${params}`}
-        ...
-    >
-        Continue with Kakao
-    </Button>
+```tsx
+<Button
+	as={"a"}
+	href={`/oauth/authorize?${params}`}
+	...
+>
+	Continue with Kakao
+</Button>
+```
 
 kakao login버튼을 클릭하면 정보 제공 동의 화면으로 이동이 된다.
 
@@ -1969,40 +1983,42 @@ kakao login버튼을 클릭하면 정보 제공 동의 화면으로 이동이 �
 
 # ! kakao로그인 성공시 response code 403발생
 
-    kakao로그인 성공이 되었음에도 유저 로그인 인식이 늦게 이뤄짐.
-    또는 화면을 변경하고 나서 refetch가 되면서 로그인 된걸 인식함.
-    back-end쪽에 print()가 refetch가 될때야 실행이됨. 로그인 시도시 back-end쪽으로 로직이 오지않는 것같음.
+kakao로그인 성공이 되었음에도 유저 로그인 인식이 늦게 이뤄짐.
+또는 화면을 변경하고 나서 refetch가 되면서 로그인 된걸 인식함.
+back-end쪽에 print()가 refetch가 될때야 실행이됨. 로그인 시도시 back-end쪽으로 로직이 오지않는 것같음.
 
-    !! api.ts에 instance부분에 return값이 잘못되었음.
-        instance.post(...).then((response) => response.data)
+!! api.ts에 instance부분에 return값이 잘못되었음.
 
-        response.data -> response.status
+    instance.post(...).then((response) => response.data)
 
-    return값이 잘못되었다고 post요청이 아예안간것 같이 작동된것은 의아스럽다.
+    response.data -> response.status 으로 수정
+
+return값이 잘못되었다고 post요청이 아예안간것 같이 작동된것은 의아스럽다.
 
 ### 20.12 Log In Form
 
 login form은 완성하도록 하겠다. username과 password를 state에 저장 기능을 구현한다.
-
 react hook form을 사용하면 react로 validate하고 form만드는 것을 가능하게 한다.
 
 input의 value와 state의 value를 연결하는 작업을 진행한다.
 
-@components/LoginModal
+@components/LoginModal.tsx
 
-    const [username, onChangeUsername] = useState("");
-    ...
-    const onChange = (event: React.SyntheticEvent<HTMLInputElement>) => {
-        console.log(event.currentTarget);
-    };
-    ...
-        <Input
-            name="username"  // name 값을 통해 변경되는 주체를 파악한다.
-            onChange={onChange}
-            value={username}
-            ...
-        />
-    ...
+```tsx
+const [username, onChangeUsername] = useState("");
+...
+const onChange = (event: React.SyntheticEvent<HTMLInputElement>) => {
+	console.log(event.currentTarget);
+};
+...
+	<Input
+		name="username"  // name 값을 통해 변경되는 주체를 파악한다.
+		onChange={onChange}
+		value={username}
+		...
+	/>
+...
+```
 
     >>>: <input name="username" placeholder="Username" class="chakra-input css-1adv6i9">
     ! value값이 출력에 나오지는 않지만 존재한다.
@@ -2011,38 +2027,44 @@ input의 value와 state의 value를 연결하는 작업을 진행한다.
 
 Input 입력값을 state에 넣어주도록 한다.
 
-    const onChange = (event: ...) => {
-        const { name, value } = event.currentTarget;
-        if (name === "username") {
-            onChangeUsername(value);
-        } else if (name === "password") {
-            onChangePassword(value);
-        }
-    }
+```tsx
+const onChange = (event: ...) => {
+	const { name, value } = event.currentTarget;
+	if (name === "username") {
+		onChangeUsername(value);
+	} else if (name === "password") {
+		onChangePassword(value);
+	}
+}
+```
 
 Input 입력값이 state에 저장되면서 Input에 변경값이 나온다.
 
 이제 log in버튼 기능을 작성한다. form으로 username, password, login을 감싼다. modalbody로 감싸져 있으며 기본 속성은 div이며 변경이 가능하다.
 
-    <ModalBody as={"form"}>
-        ...
-            <Input
-                ...
-                type="password"  // 비밀번호 입력처럼 입력값이 별표로 표시된다.
-            >
-        ...
-        <Button
-            type="submit"  // 값이 제출되며 화면이 새로고침 된다.
-        >
+```tsx
+<ModalBody as={"form"}>
+	...
+		<Input
+			...
+			type="password"  // 비밀번호 입력처럼 입력값이 별표로 표시된다.
+		>
+	...
+	<Button
+		type="submit"  // 값이 제출되며 화면이 새로고침 된다.
+	>
+```
 
 화면 새로고침 기능을 삭제하기 위해 함수를 사용하여 기능을 구현한다.
 
-    const onSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
-        event.preventDefault();
-    };
-    ...
-        <ModalBody as={"form"} onSubmit={onSubmit}>
-            ...
+```tsx
+	const onSubmit = (event: React.SyntheticEvent<HTMLFormElement>) => {
+		event.preventDefault();
+	};
+	...
+		<ModalBody as={"form"} onSubmit={onSubmit}>
+			...
+```
 
 ModalBody는 기본 설정이 div이기 때문에 onSubmit을 사용하면 속성 오류때문에 오류가 발생한다.
 두가지 방법이 있는데 onSubmit 제네럴의 타입을 변경하던지,ModalBody가 form이라고 알려줘야한다.
