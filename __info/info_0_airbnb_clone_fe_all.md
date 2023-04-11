@@ -2069,8 +2069,8 @@ Input 입력값이 state에 저장되면서 Input에 변경값이 나온다.
 ModalBody는 기본 설정이 div이기 때문에 onSubmit을 사용하면 속성 오류때문에 오류가 발생한다.
 두가지 방법이 있는데 onSubmit 제네럴의 타입을 변경하던지,ModalBody가 form이라고 알려줘야한다.
 
-    1. <HTMLFormElement>  ->  <HTMLDivElement>
-    2. onSubmit={onSubmit}  ->  onSubmit={onSubmit as any}
+1. <HTMLFormElement> -> <HTMLDivElement>
+2. onSubmit={onSubmit} -> onSubmit={onSubmit as any}
 
 username과 password는 필수 값이기 때문에 required값을 부여한다.
 
@@ -2085,34 +2085,46 @@ react hook form을 사용하면 form데이터 관리 로직이 매우 줄어든�
 
 loginmodal에 해당 hook을 import하여 구연한다.
 
-    import { useForm } from "react-hook-form";
+@src/components/LoginModal.tsx
+
+```tsx
+import { useForm } from "react-hook-form";
+...
+  const { register } = useForm();  // register: input에 값을 등록하는데 사용된다.
+```
+
+input의 name, onchange, value를 삭제하고 register함수를 구현한다. ModalBody의 onSubmit도 삭제한다.
+
+```tsx
+console.log(register("great"))
+...
+  <Input
     ...
-        const { register } = useForm();  // register: input에 값을 등록하는데 사용된다.
+    {...register("[name으로 사용될 값]")}  // ...는 실제 입력되는 텍스트이다.
+  >
+```
 
-input의 name,onchange, value를 삭제하고 register함수를 구현한다. ModalBody의 onSubmit도 삭제한다.
-
-    console.log(register("great"))
-    ...
-        <Input
-            ...
-            {...register("[name으로 사용될 값]")}  // ...는 실제 입력되는 텍스트이다.
-        >
-
-    >>>: name: "great"
-         onBlur: async event => {...}
-         onChange: async event => {...}
-         ref: ref => {…}
+```shell
+>>>: name: "great"
+    onBlur: async event => {...}
+    onChange: async event => {...}
+    ref: ref => {…}
+```
 
 ...연산자를 통해 register함수가 실행되면서 Input컴포넌트 속성에 4가지가 추가되는 것이다.
 
 useForm에서 watch를 가져와 사용을 하면 Input값이 변경될 때마다 watch값에 업데이트가 된다.
 
-    const { register, watch } = useForm()
-    console.log(watch())
+```tsx
+const { register, watch } = useForm();
+console.log(watch());
+```
 
 Login Form의 Input을 입력할때마다 console에 입력되어 있는 값들이 출력된다.
 
-    >>>: {username: '...', password: '...'}
+```shell
+>>>: {username: '...', password: '...'}
+```
 
 register에 등록한 value가 key로 등록되어 저장된다. 물론 register에 등록한 input값만 가져온다.
 useForm의 register,watch만으로 state설정 및 값 등록, 불러오기가 가능해졌다.
@@ -2120,28 +2132,34 @@ useForm의 register,watch만으로 state설정 및 값 등록, 불러오기가 �
 data검증을 위해 handleSubmit()를 가져오도록 하겠다. event.preventDefault()를 기본적으로 제공해준다.
 handlesubmit()를 기본 기능을 구현해본다.
 
-    const submit = () => {
-        console.log("submitted!");
-    };
-    ...
-        <ModalBody ... onSubmit={handleSubmit(submit)}>
+```tsx
+const submit = () => {
+  console.log("submitted!");
+};
+...
+  <ModalBody ... onSubmit={handleSubmit(submit)}>
+```
 
 onSubit안에 submit()만을 넣게 되면 화면이 새로고침되면서 console값을 볼 수 없다.
 handleSubmit()안에 submit을 넣게되면 새로고침되지않고 onSubmit을 할 수 있다.
 
 onSubmit에 구현을 진행한다.
 
-    interface IUser {
-        username: string;
-        password: string;
-    }
-    ...
-        const { ... } = useForm<IUser>();  // IUser type
-        const onSubmit = (data: IUser) => {  // IUser type
-            console.log(data);
-        };
+```tsx
+interface IUser {
+  username: string;
+  password: string;
+}
+...
+  const { ... } = useForm<IUser>();  // IUser type
+  const onSubmit = (data: IUser) => {  // IUser type
+    console.log(data);
+  };
+```
 
-    >>>: {username: '...', password: '...'}
+```shell
+>>>: {username: '...', password: '...'}
+```
 
 key의 type을 지정한다.
 
@@ -2152,54 +2170,63 @@ required를 브라우져에서 삭제한 후 빈칸으로 login버튼을 클릭�
 우리는 html만 믿을게 아니라 js, react-hook-form의 validate가능도 필요하다.
 register에 값이 들어오는 것도 검증이 필요하기때문에 required를 부여하도록 한다.
 
-    <Input
-        {...register("[key]", {  // 다시 강조하지만 register앞에 ...는 실제 텍스트이다.
-            required: true,
-        })}
-    >
+```tsx
+<Input
+  {...register("[key]", {  // 다시 강조하지만 register앞에 ...는 실제 텍스트이다.
+    required: true,
+  })}
+>
+```
 
 validate이 진행되며 오류가 있는 input으로 입력할 수 있도록 포커스 된다.
 좋은 UX(사용자경험)이며 구현 및 관리할 필요가 없어 편리하다.
 
 required에 true대신에 text를 넣어서 error표시를 변경할 수 있다.
 
-    const { ... formState: {errors} } = useForm<IUser>();  // formState.errors를 가져온다.
-    console.log(errors);
-    ...
-        {...register("username", {
-            required: "Please input your username",
-        })}
+```tsx
+const { ... formState: {errors} } = useForm<IUser>();  // formState.errors를 가져온다.
+console.log(errors);
+...
+  {...register("username", {
+    required: "Please input your username",
+  })}
+```
 
-    >>>: {username: {
-            message: "Please input your username",
-            ref: input.chakra-input.css-...,
-            type: "required",
-        }, password: {
-            ...
-        }}
+```shell
+>>>: {username: {
+      message: "Please input your username",
+      ref: input.chakra-input.css-...,
+      type: "required",
+    }, password: {
+      ...
+    }}
+```
 
 해당 콘솔값을 보기 위해서는 input의 required를 삭제해야 console값이 출력된다.
-
 해당 오류 메세지를 form안에 추가해준다. 해당 테스트도 input의 required를 삭제 후 진행한다.
 
-    <InputGroup>
-        ...
-        <Text ...>
-            {errors.username?.message}  // password도 동일하게 적용해준다.
-        </Text>
-    </InputGroup>
+```tsx
+<InputGroup>
+  ...
+  <Text ...>
+    {errors.username?.message}  // password도 동일하게 적용해준다.
+  </Text>
+</InputGroup>
+```
 
 onSubmit이전에는 Text가 보이지 않다가 오류가 발생하면 Input옆에 message가 출력된다.
 (그렇게 예쁘게 출력되지는 않는다. 외국사이트에서는 봤던거 같다. )
 
 #20.13 React Hook Form_1 (register required text) 참조
-![#20.13 React Hook Form_1 (register required text)]()
+![#20.13 React Hook Form_1 (register required text)](<https://raw.githubusercontent.com/byeon2261/airbnb-clone-frontend/main/__img/%2320.13%20React%20Hook%20Form_1%20(register%20required%20text).png>)
 
 required text출력대신 error가 발생한 input을 표시해줄수 있다.
 
-    <Input
-        isInvailed={Boolean(errors.username?.message)}
-    >
+```tsx
+<Input
+  isInvailed={Boolean(errors.username?.message)}
+>
+```
 
 에러가 발생하면 해당 Input 테두리가 red.500색으로 변경된다.
 해당 기능이 안좋은 점이 에러가 난 Input의 테두리는 변경되지만
