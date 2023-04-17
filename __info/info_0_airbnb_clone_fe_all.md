@@ -2100,7 +2100,7 @@ console.log(register("great"))
 ...
   <Input
     ...
-    {...register("[name으로 사용될 값]")}  // ...는 실제 입력되는 텍스트이다.
+    {...register("[name으로 사용될 값]")}  // "..."는 실제 입력되는 텍스트이다.
   >
 ```
 
@@ -2172,7 +2172,7 @@ register에 값이 들어오는 것도 검증이 필요하기때문에 required�
 
 ```tsx
 <Input
-  {...register("[key]", {  // 다시 강조하지만 register앞에 ...는 실제 텍스트이다.
+  {...register("[key]", {  // 다시 강조하지만 register앞에 "..."는 실제 텍스트이다.
     required: true,
   })}
 >
@@ -2243,67 +2243,74 @@ API에다 데이터를 보내주는 것을 mutation이라고 한다.
 우선 login api를 생성한다. username과 password를 object로 받는다.
 @api.ts
 
-    export interface IUsernameLoginVariables {
-      username: string;
-      password: string;
-    }
+```ts
+export interface IUsernameLoginVariables {
+  username: string;
+  password: string;
+}
 
-    export const usernameLogin = ({
-      username,
-      password,
-    }: IUsernameLoginVariables) =>
-      instance
-        .post(
-          "users/log-in",
-          { username, password },
-          {
-            headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
-          }
-        )
-        .then((response) => response.data);
+export const usernameLogin = ({
+  username,
+  password,
+}: IUsernameLoginVariables) =>
+  instance
+    .post(
+      "users/log-in",
+      { username, password },
+      {
+        headers: { "X-CSRFToken": Cookie.get("csrftoken") || "" },
+      }
+    )
+    .then((response) => response.data);
+```
 
 Django에서는 data를 ok, error 두가지중 하나를 보내준다.(로그인 성공, 실패)
 두 repsonse의 type도 정의 해준다.
 
-    export interface IUsernameLoginSuccess {
-      ok: string;
-    }
-    export interface IUsernameLoginError {
-      error: string;
-    }
+```ts
+export interface IUsernameLoginSuccess {
+  ok: string;
+}
+export interface IUsernameLoginError {
+  error: string;
+}
+```
 
 reponse값을 사용할때 해당 타입을 사용하면 된다.
-
 해당 api를 이용하여 mutatiion을 구현한다.
 
 @src/components/LoginModal.tsx
 
-    const mutation = useMutation(usernameLogin, {
-      onMutate: () => {
-        console.log("mutation starting");
-      },
-      onSuccess: (data) => {
-        queryClient.refetchQueries(["me"]);  // refetch를 진행해야 화면에서 로그인이 표시된다.(로그아웃과 같다.)
-        toast({
-          title: "Welcome back!",
-          status: "success",
-        });
-        onClose();  // 로그인이 된다고 모달창이 자동으로 닫히지 않는다. 닫아주자
-      },
-      onError: (error) => {
-        ...  // 다음시간에 error를 구현한다.
-      },
+```tsx
+const mutation = useMutation(usernameLogin, {
+  onMutate: () => {
+    console.log("mutation starting");
+  },
+  onSuccess: (data) => {
+    queryClient.refetchQueries(["me"]);  // refetch를 진행해야 화면에서 로그인이 표시된다.(로그아웃과 같다.)
+    toast({
+      title: "Welcome back!",
+      status: "success",
     });
-    const onSubmit = ({ username, password }: IUser) => {
-      mutation.mutate({ username, password });
-    };
+    onClose();  // 로그인이 된다고 모달창이 자동으로 닫히지 않는다. 닫아주자
+  },
+  onError: (error) => {
+    ...  // 다음시간에 error를 구현한다.
+  },
+});
+const onSubmit = ({ username, password }: IUser) => {
+  mutation.mutate({ username, password });
+};
+```
 
 mutate의 isloading을 사용하여 props의 isloading을 구현할 수 있다.
 
-    <Button
-      isLoading={mutation.isLoading}
-      ...
-    >
+```tsx
+<Button
+  isLoading={mutation.isLoading}
+  ...
+>
+```
 
 로딩중에 버튼에서 로딩표시가 생긴다.(spinner, 시계방향으로 원모양이 뺑글뺑글 회전한다. )
 
@@ -2311,13 +2318,17 @@ mutate의 isloading을 사용하여 props의 isloading을 구현할 수 있다.
 
 로그인 오류시 오류 메세지를 나오도록 구현하겠다. useMutation을 사용하여 쉽게 구현이 가능하다.
 
-@src/componenets/LoginModal
+@src/componenets/LoginModal.tsx
 
-    {mutation.error ? (
-      <Text color={"red.500"} textAlign={"center"} fontSize={"sm"}>
-        username or password is wrong
-      </Text>
-    ) : null}
+```tsx
+{
+  mutation.error ? (
+    <Text color={"red.500"} textAlign={"center"} fontSize={"sm"}>
+      username or password is wrong
+    </Text>
+  ) : null;
+}
+```
 
 로그인 오류 기능을 구현하지만 데이터를 잘못입력해도 로그인 성공 toast가 나온다. (로그인은 안된다)
 백엔드부분에 response데이터 부분을 수정 진행...
@@ -2327,47 +2338,55 @@ backend에서 성공여부에 따라 response에 http프로토콜을 보내주�
 
 @api.ts
 
-    export const usernameLogin = (...) => instance.post(...);
+```ts
+export const usernameLogin = (...) => instance.post(...);
+```
 
 로그인을 하면 로그인 정보가 모달창 input에 남아 있다. input을 reset하는 기능을 구현한다.
 
-    const {
-      ...,
-      reset,
-    } = useForm<IUser>();
-    ...
-      reset()
+```tsx
+const {
+  ...,
+  reset,
+} = useForm<IUser>();
+...
+  reset()
+```
 
 만약 값을 변경하고 싶다면 setValue()를 사용하면된다.
 
-    const {
-      ...,
-      setValue,
-    } = useForm<IUser>();
-    ...
-      setValue("username", "I Love You.")  // (변경할 대상, 변경할 값)
+```tsx
+const {
+  ...,
+  setValue,
+} = useForm<IUser>();
+...
+  setValue("username", "I Love You.")  // (변경할 대상, 변경할 값)
+```
 
 로그아웃부분을 mutation기능을 사용하여 로직을 변경해본다.
 
-    const toastId = useRef<ToastId>();  // useRef(): state에 넣지않고 컴포넌트내에서 데이터를 관리할때 사용된다.
-    const mutation = useMutation(logOut, {
-      onMutate: () => {
-        toastId.current = toast({  // ref.current를 사용하여 데이터를 관리한다.(기본값)
-          ...
-        });
-      },
-      onSuccess: () => {
-        if (toastId.current) {  // current type = undefined이므로 if문을 사용하여 값의 확실성을 갖어야 오류가 발생하지 않는다.
-          toast.update(toastId.current, {
-            ...
-          });
-        }
-        queryClient.refetchQueries(["me"]);
-      },
+```tsx
+const toastId = useRef<ToastId>();  // useRef(): state에 넣지않고 컴포넌트내에서 데이터를 관리할때 사용된다.
+const mutation = useMutation(logOut, {
+  onMutate: () => {
+    toastId.current = toast({  // ref.current를 사용하여 데이터를 관리한다.(기본값)
+      ...
     });
-    const onLogOut = async () => {
-      mutation.mutate();
-    };
+  },
+  onSuccess: () => {
+    if (toastId.current) {  // current type = undefined이므로 if문을 사용하여 값의 확실성을 갖어야 오류가 발생하지 않는다.
+      toast.update(toastId.current, {
+        ...
+      });
+    }
+    queryClient.refetchQueries(["me"]);
+  },
+});
+const onLogOut = async () => {
+  mutation.mutate();
+};
+```
 
 # ! toastId type 오류
 
@@ -2375,7 +2394,7 @@ onSuccess()부분에 if문을 사용하지 않았을 때 toast.update(`toastId.c
 
     >>>: Type 'undefined' is not assignable to type 'ToastId'.
 
-    해당로직을 if() 안에 넣어주면 오류가 발생하지 않는다.
+!! 해당로직을 if() 안에 넣어주면 오류가 발생하지 않는다.
 
 ### 20.16 Code Challenge
 
@@ -2396,13 +2415,17 @@ onSuccess()부분에 if문을 사용하지 않았을 때 toast.update(`toastId.c
 
 user 생성 post프로토콜을 전송하는데 backend쪽에서는 OPTIONS 프로토콜이 들어오면서 301 상태를 반환한다.
 
-    !! 데이터를 전송하는 backend url이 잘못되었었다.
+!! 데이터를 전송하는 backend url이 잘못되었었다.
 
-    "users" -> "users/"
+```python
+"users/" # <- "users"에서 변경. 끝에 '/'를 붙여줘야한다.
+```
 
-    back-end구조가 config url에서 각 app의 url로 이동이 된다. 이동되면서 "/"를 붙여주면서 path를 이동한다.("users/")
-        (app에서 "/"를 붙여주는것보다 안정성이 높았던 것으로 기억한다.)
-    이전 로직 "users"에서는 path를 제대로 찾지 못한것으로 보인다.
+back-end구조가 config url에서 각 app의 url로 이동이 된다. 이동되면서 "/"를 붙여주면서 path를 이동한다.("users/")
+
+> (app에서 "/"를 붙여주는것보다 안정성이 높았던 것으로 기억한다.)
+
+이전 로직 "users"에서는 path를 제대로 찾지 못한것으로 보인다.
 
 데이터를 제대로 전달하는지 확인도 하지않고 완료되었다면 커밋을 진행하였다.
 mutate()를 호출할때 데이터를 넣어주면 된다.
@@ -2415,25 +2438,27 @@ githun, kakao 로그인을 mutation으로 변경하는 작업 진행중.
 이전 기능에서는 api를 호출하면서 async-await함수를 사용하면서 반환값을 기달리고 화면을 전환하는 기능을 구현할 수 있었다.
 하지만 mutation.mutate는 반환값이 없다. 그래서 로그인 정보가 들어오기 전에 화면 전환이 이뤄지면서 user query refech기능도 사용이 안된다.
 
-! mutation.mutateAsync를 사용하면 response값을 받은 다음 로직이 진행이 된다.!!
+!! mutation.mutateAsync를 사용하면 response값을 받은 다음 로직이 진행이 된다.!!
 
 ### 21.0 Protected Pages
 
 유저가 방을 등록하는 페이지를 생성한다.
-@routes/UploadRoom.tsx 생성, router.tsx에 childer path 추가.
+@routes/UploadRoom.tsx 생성, router.tsx에 children path 추가.
 
 헤더 아바타 아이콘 리스트에 접근할 수 있는 링크 버튼을 생성한다. 해당 버튼은 유저 권한이 is_host가 있을때만 뜬다.
 
-@Components/Header
+@Components/Header.tsx
 
-    <MenuList>
-      {user?.is_host ? (
-        <Link to={"/api/v2/rooms/upload"}>
-          <MenuItem>Upload Room</MenuItem>
-        </Link>
-      ) : null}
-      ...
-    </MenuList>
+```tsx
+<MenuList>
+  {user?.is_host ? (
+    <Link to={"/api/v2/rooms/upload"}>
+      <MenuItem>Upload Room</MenuItem>
+    </Link>
+  ) : null}
+  ...
+</MenuList>
+```
 
 보안을 사용하여 페이지를 열수있는 권한을 가진 유저만이 페이지에 접근하도록 한다.
 
@@ -2441,44 +2466,51 @@ githun, kakao 로그인을 mutation으로 변경하는 작업 진행중.
 2. 그리고 is_host 권한을 가진 유저만이 접근 가능한 컴포넌트를 생성한다.
 
 useUser.ts 훅을 사용하여 유저 권한을 확인한다.
+@src/components/ProtectedPage.tsx
 
-    export default function ProtectedPage({ children }: IProtectedPageProp) { // children: components안의 element
-      const { userLoading, isLoggedIn } = useUser();  // header에서 데이터를 이미 불러왔기때문에 cashe에서 데이터를 가져온다.
-      const navigate = useNavigate();
-      useEffect(() => {
-        if (!userLoading) {
-          if (!isLoggedIn) {
-            navigate("/");
-          }
-        }
-      }, [userLoading, isLoggedIn, navigate]);  // useEffect listen list
-      return <>{children}</>;
+```tsx
+// children: components안의 element
+export default function ProtectedPage({ children }: IProtectedPageProp) {
+  const { userLoading, isLoggedIn } = useUser(); // header에서 데이터를 이미 불러왔기때문에 cashe에서 데이터를 가져온다.
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!userLoading) {
+      if (!isLoggedIn) {
+        navigate("/");
+      }
     }
+  }, [userLoading, isLoggedIn, navigate]); // useEffect listen list
+  return <>{children}</>;
+}
+```
 
 로그인이 안된상태에서는 홈으로 이동된다.
-
 is_host권한은 user.is_host에서 확인한다.
 
 해당 컴포넌트를 UploadRoom route에 사용한다.
 @routes/UploadRoom.tsx
 
-    <ProtectedPage>
-      <HostOnlyPage>
-        <h1>upload roommmmmm</h1>;
-      </HostOnlyPage>
-    </ProtectedPage>
+```tsx
+<ProtectedPage>
+  <HostOnlyPage>
+    <h1>upload roommmmmm</h1>;
+  </HostOnlyPage>
+</ProtectedPage>
+```
 
 두 컴포넌트는 훅으로도 생성하여 사용이 가능하다. 훅으로 사용시 매개변수와 리턴값이 없이 사용하면 된다.
 
-@routes/UploadRoom
+@routes/UploadRoom.tsx
 
-    ...
-    useHostOnlyPage();
-    return (
-      <ProtectedPage>
-        <h1>...</h1>;
-      </ProtectedPage>
-    );
+```tsx
+...
+useHostOnlyPage();
+return (
+  <ProtectedPage>
+    <h1>...</h1>;
+  </ProtectedPage>
+);
+```
 
 ### 21.1 Upload Form
 
@@ -2513,21 +2545,23 @@ upload room화면에 category, amenity 목록을 가져와서 선택하여 저�
 
 @src/routes/UploadRoom.tsx
 
-    const { data: amenities, isLoading: isAmenitiesLoading } = useQuery<
-      IAmenity[]
-    >(["amenities"], getAmenities);
-    ...
-      <FormControl>
-        <FormLabel>Amenities</FormLabel>
-        <Grid templateColumns={"1fr 1fr"} gap={5}>
-          {amenities?.map((amenity) => (
-            <Box key={amenity.pk}>
-              <Checkbox>{amenity.name}</Checkbox>
-              <FormHelperText>{amenity.description}</FormHelperText>
-            </Box>
-          ))}
-        </Grid>
-      </FormControl>
+```tsx
+const { data: amenities, isLoading: isAmenitiesLoading } = useQuery<
+  IAmenity[]
+>(["amenities"], getAmenities);
+...
+  <FormControl>
+    <FormLabel>Amenities</FormLabel>
+    <Grid templateColumns={"1fr 1fr"} gap={5}>
+      {amenities?.map((amenity) => (
+        <Box key={amenity.pk}>
+          <Checkbox>{amenity.name}</Checkbox>
+          <FormHelperText>{amenity.description}</FormHelperText>
+        </Box>
+      ))}
+    </Grid>
+  </FormControl>
+```
 
 저장 버튼을 생성한다.
 
@@ -2550,6 +2584,9 @@ UploadRooms에 useMutation을 사용하여 데이터 전송 상태관리 기능�
 암튼 그렇다. 다음 강의에서 해당 오류를 수정하는 과정을 진행할 것이다.
 지금으로써는 backend에 category serializer를 변경한것 외에는 강의와 차이가 없다. (room category만 따로 찾아온는 view를 추가했다.)
 
+!! back-end에 basic인증기능을 테스트용으로 넣었다가 빼지않고 사용중이였다.
+basic인증에서 유저정보가 있어서 오류가 발생하지 않았다. 추후에 수정진행함.
+
 ### 21.4 Bugfix
 
 지난 강의에서 발생한 오류는 backend에서 Response로 데이터를 보낼때 context값을 보내지 않아 발생한 오류이다.
@@ -2563,6 +2600,8 @@ UploadRooms에 useMutation을 사용하여 데이터 전송 상태관리 기능�
 
     [추후에 오류 해결시 내용 추가]
 
+---
+
 방 생성시 해당 방detail페이지로 이동되도록 구현한다. 방이 생성될때 backend에서 생성된 방 데이터를 반환한다.
 @src/api.ts>uploadRoom
 
@@ -2570,24 +2609,26 @@ UploadRooms에 useMutation을 사용하여 데이터 전송 상태관리 기능�
 
 @src/routes/UploadRoom.tsx
 
-    - useNavigate() [L.2009]
-    - useMutation()에 매개변수 추가 및 타입 설정 [L.1915]
+- useNavigate() [L.2009]
+- useMutation()에 매개변수 추가 및 타입 설정 [L.1915]
 
 방 데이터에 사진이 없을 경우 에러가 발생하며 pageNotFound페이지로 이동이 된다.
-사진이 없을 경우 null이 출력되도록 적용을 한다.
+사진이 없을 경우 null이 출력되도록 적용을 한다. Home과 RoomDetail에 적용.
 
 @src/routes/Home.tsx
 
-    # ?는 데이터가 없을 경우 null을 반환한다.
+    // ?는 데이터가 없을 경우 null을 반환한다.
     room.photos[0].file -> room.photos[0]?.file
 
 @src/routes/RoomDetail.tsx
 
-    {data?.photos && data.photos.length > 0 ? (
-      <Image
-        ...
-      />
-    ) : null}
+```tsx
+{data?.photos && data.photos.length > 0 ? (
+  <Image
+    ...
+  />
+) : null}
+```
 
 backend에서 데이터를 생성할때 pk대신에 컬럼명을 id로 생성하기때문에 type명을 변경한다.
 
