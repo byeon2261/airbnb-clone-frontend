@@ -2661,13 +2661,13 @@ upload photo페이지를 구현한다.
 @src/routes/UploadPhotos.tsx
 
 ```javascript
-    ...
-    <Input
-      {...register("file")}
-      type={"file"}  // 입력 파일형식을 받는다.
-      accept="image/*"  // image형식만 가능하다.
-    />
-    ...
+...
+<Input
+  {...register("file")}
+  type={"file"}  // 입력 파일형식을 받는다.
+  accept="image/*"  // image형식만 가능하다.
+/>
+...
 ```
 
 일반적인 업로드형식을 따르면 이렇다
@@ -2754,7 +2754,7 @@ import "react-calendar/dist/Calendar.css";
 
 캘린더 컴포넌트를 사용하여 바로 기능을 사용이 가능하다. 속성을 넣어 일부 기능을 변경하겠다.
 
-```javascript
+```tsx
 <Calendar
   onChange={setDates}
   prev2Label={null} // 이전 년단위 이동 버튼을 삭제한다.
@@ -2788,7 +2788,7 @@ d.toJSON().split("T")
 
 toJSON().split()를 이용하여 날짜값으로 가져와본다.
 
-```javascript
+```tsx
 ...
 const [dates, setDates] = useState<Date[]>();  // 배열타입으로 변경한다.
 useEffect(() => {
@@ -2838,19 +2838,19 @@ const { data: checkBookingData, isLoading: isCheckingBooking } = useQuery(
 type checkBookingQueryKey = [string, string?, Date[]?];  // dates 타입을 지정해줘야 type오류가 발생하지 않는다.
 
 export const checkBooking = ({
-    queryKey,
+  queryKey,
 }: QueryFunctionContext<checkBookingQueryKey>) => {
-    const [_, roomPk, dates] = queryKey;
-    if (dates) {
-        const [firstDate, secondDate] = dates;  // 이부분이 타입이 없다면 오류가 발생.
-        const [checkIn] = firstDate.toJSON().split("T");
-        const [checkOut] = secondDate.toJSON().split("T");
-        return instance
-        .get(
-            `rooms/${roomPk}/bookings/check?check_in=${checkIn}&check_out=${checkOut}`
-        )
-        .then((response) => response.data);
-    }
+  const [_, roomPk, dates] = queryKey;
+  if (dates) {
+    const [firstDate, secondDate] = dates;  // 이부분이 타입이 없다면 오류가 발생.
+    const [checkIn] = firstDate.toJSON().split("T");
+    const [checkOut] = secondDate.toJSON().split("T");
+    return instance
+    .get(
+        `rooms/${roomPk}/bookings/check?check_in=${checkIn}&check_out=${checkOut}`
+    )
+    .then((response) => response.data);
+  }
 };
 ```
 
@@ -2858,7 +2858,7 @@ export const checkBooking = ({
 
 가능여부에 따라 화면에서 예약버튼 클릭가능여부 및 불가능 안내문구를 추가해준다.
 
-```javascript
+```tsx
 <Button
   disabled={!checkBookingData?.ok} // false일 경우 클릭 불가능
   isLoading={isCheckingBooking}
@@ -2889,7 +2889,7 @@ export const checkBooking = ({
 예를 들어 10일까지 예약이 되어 있고 11일에 예약을 할려고 하면 예약이 이미 있다고 체크가 된다.
 그러므로 toJSON()으로 가져오는 방식을 변경하기로 한다.
 
-```javascript
+```tsx
 `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDay()}`;
 ```
 
@@ -2910,12 +2910,14 @@ export const formatDate = (date: Date) =>
 
 웹페이지가 변경될때 title을 변경하고자 한다면 react-Helmet을 사용하여 기능구현을 한다.
 
-    $ npm i react-Helmet
-    $ npm i --save-dev @types/react-helmet
+```shell
+$ npm i react-Helmet
+$ npm i --save-dev @types/react-helmet
+```
 
 구현할 페이지에 아무곳에 helmet컴포넌트를 넣어서 사용하면 된다.
 
-```javascript
+```tsx
 <Helmet>
   <title>{data ? data.name : `Loading...`}</title>
 </Helmet>
@@ -2927,16 +2929,16 @@ export const formatDate = (date: Date) =>
 
 ```javascript
 <Button
-    isLoading={... && dates !== undefined}
+  isLoading={... && dates !== undefined}
 >
 ```
 
 Calendar에서 showDoubleView 속성을 사용하게 될경우 next month의 날짜를 선택하면 현재달로 인식하면서 선택한 달이 왼쪽으로 이동하는 현상이 있었다.
 그 현상을 억제하는 props가 있다.
 
-```javascript
+```tsx
 <Calendar
-    goToRangeStartOnSelect
+  goToRangeStartOnSelect
 >
 ```
 
